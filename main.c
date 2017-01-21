@@ -103,21 +103,15 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                        0, 255, 0,
                        255
                       );
-
-    // Draw head
-    SDL_Rect snakeRect = { head->x, head->y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
-    SDL_RenderFillRect(renderer, &snakeRect);
-    
     
     Body *current = head;
     
-    // Draw body
-    while (1){
-        if(current-> next == NULL)
-            break;
-        current = current-> next;
+    // Draw snake
+    while (current != NULL){
         SDL_Rect snakeRect = { current->x, current->y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
         SDL_RenderFillRect(renderer, &snakeRect);
+        
+        current = current->next;
     }
     
     SDL_RenderPresent(renderer);
@@ -151,16 +145,17 @@ void moveSnake(GameState game, Body *head)
     }
     
     /* Move Body */
-    Body *current = head;
+    Body *current = head->next;
     Body *previous = head;
     
-    while (current->next != NULL) {
-        current = current->next;
+    while (current != NULL) {
         current->pastX = current->x;
         current->x = previous->pastX;
         current->pastY = current->y;
         current->y = previous->pastY;
+        
         previous = current;
+        current = current->next;
     }
 }
 
@@ -181,28 +176,50 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     int blockX = WIDTH / BLOCK_SIZE;
     int blockY = HEIGHT / BLOCK_SIZE;
     
+    int ok = 0;
+    
     /* Apple collision */
     if (collision2D(head->x, head->y, apple->x, apple->y)) {
-        // Change apple location
-        apple->x = (random() % blockX) * BLOCK_SIZE;
-        apple->y = (random() % blockY) * BLOCK_SIZE;
+        while (!ok) {
+		    // Change apple location
+		    apple->x = (random() % blockX) * BLOCK_SIZE;
+		    apple->y = (random() % blockY) * BLOCK_SIZE;
+		    
+		    // Check if location doesn't overlap with the snake
+			if (apple->x != head->x && apple->y != head->y)
+				ok = 1;
+			
+			Body *current = head;
+			Body *previous = head;
+		
+			while(current != NULL) {
+				if (apple->x == current->x && apple->y == current->y)
+					ok = 0;
+				else
+					ok = 1;
+				
+				previous = current;
+				current = current->next;
+			}
+		}
         
         // Add body parts
         game->parts++;
     }
     
     /* Body collision */
-    Body *current = head;
-    Body *previous = head;
+    Body *current = head->next;
+    Body *previous = head->next;
     
-    while (current->next != NULL) {
-        current = current->next;
+    while (current != NULL) {
         if (collision2D(head->x, head->y, current->x, current->y)) {
             printf("GAME OVER\n");
             game->running = SDL_FALSE;
             break;
         }
+        
         previous = current;
+        current = current->next;
     }
     
     /* Outside boundary */
