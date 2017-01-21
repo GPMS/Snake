@@ -94,7 +94,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                        255, 0, 0,
                        255
                       );
-    SDL_Rect appleRect = { apple.x, apple.y, BLOCK_SIZE, BLOCK_SIZE };
+    SDL_Rect appleRect = { apple.x, apple.y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
@@ -105,7 +105,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                       );
 
     // Draw head
-    SDL_Rect snakeRect = { head->x, head->y, BLOCK_SIZE, BLOCK_SIZE };
+    SDL_Rect snakeRect = { head->x, head->y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
     SDL_RenderFillRect(renderer, &snakeRect);
     
     
@@ -116,7 +116,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
         if(current-> next == NULL)
             break;
         current = current-> next;
-        SDL_Rect snakeRect = { current->x, current->y, BLOCK_SIZE, BLOCK_SIZE };
+        SDL_Rect snakeRect = { current->x, current->y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
         SDL_RenderFillRect(renderer, &snakeRect);
     }
     
