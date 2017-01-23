@@ -56,20 +56,20 @@ int processEvents(SDL_Window *window, GameState *game)
                         game->running = SDL_FALSE;
                         break;
                     case SDLK_UP:
-                    	if (game->parts == 1 || game->direction != SOUTH)
-                        	game->direction = NORTH;
+                        if (game->parts == 1 || game->direction != SOUTH)
+                            game->direction = NORTH;
                         break;
                     case SDLK_DOWN:
                         if (game->parts == 1 || game->direction != NORTH)
-                        	game->direction = SOUTH;
+                            game->direction = SOUTH;
                         break;
                     case SDLK_RIGHT:
-                    	if (game->parts == 1 || game->direction != WEST)
-                        	game->direction = EAST;
+                        if (game->parts == 1 || game->direction != WEST)
+                            game->direction = EAST;
                         break;
                     case SDLK_LEFT:
                         if (game->parts == 1 || game->direction != EAST)
-                        	game->direction = WEST;
+                            game->direction = WEST;
                         break;
                 }
                 break;
@@ -183,31 +183,31 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     /* Apple collision */
     if (collision2D(head->x, head->y, apple->x, apple->y)) {
         while (1) {
-		    // Change apple location
-		    apple->x = (random() % blockX) * BLOCK_SIZE;
-		    apple->y = (random() % blockY) * BLOCK_SIZE;
-		    
-		    // Check if location doesn't overlap with the snake
-			int ok = 1;
-			if (apple->x == head->x && apple->y == head->y)
-				ok = 0;
-			
-			Body *current = head;
-			Body *previous = head;
-		
-			while(current != NULL) {
-				if (apple->x == current->x && apple->y == current->y) {
-					ok = 0;
-					break;
-				}
-				
-				previous = current;
-				current = current->next;
-			}
-			
-			if (ok)
-				break;
-		}
+            // Change apple location
+            apple->x = (random() % blockX) * BLOCK_SIZE;
+            apple->y = (random() % blockY) * BLOCK_SIZE;
+            
+            // Check if location doesn't overlap with the snake
+            int ok = 1;
+            if (apple->x == head->x && apple->y == head->y)
+                ok = 0;
+            
+            Body *current = head;
+            Body *previous = head;
+        
+            while(current != NULL) {
+                if (apple->x == current->x && apple->y == current->y) {
+                    ok = 0;
+                    break;
+                }
+                
+                previous = current;
+                current = current->next;
+            }
+            
+            if (ok)
+                break;
+        }
         
         // Add body parts
         game->parts++;
@@ -261,14 +261,14 @@ Body *newBody(Body *tail)
 
 void deleteSnake(Body *head)
 {
-	Body *freeMe = head;
-	Body *holdMe = NULL;
-	
-	while(freeMe != NULL) {
-		holdMe = freeMe->next;
-		free(freeMe);
-		freeMe = holdMe;
-	}
+    Body *freeMe = head;
+    Body *holdMe = NULL;
+    
+    while(freeMe != NULL) {
+        holdMe = freeMe->next;
+        free(freeMe);
+        freeMe = holdMe;
+    }
 }
 
 
