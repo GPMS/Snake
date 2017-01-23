@@ -176,31 +176,33 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     int blockX = WIDTH / BLOCK_SIZE;
     int blockY = HEIGHT / BLOCK_SIZE;
     
-    int ok = 0;
-    
     /* Apple collision */
     if (collision2D(head->x, head->y, apple->x, apple->y)) {
-        while (!ok) {
+        while (1) {
 		    // Change apple location
 		    apple->x = (random() % blockX) * BLOCK_SIZE;
 		    apple->y = (random() % blockY) * BLOCK_SIZE;
 		    
 		    // Check if location doesn't overlap with the snake
-			if (apple->x != head->x && apple->y != head->y)
-				ok = 1;
+			int ok = 1;
+			if (apple->x == head->x && apple->y == head->y)
+				ok = 0;
 			
 			Body *current = head;
 			Body *previous = head;
 		
 			while(current != NULL) {
-				if (apple->x == current->x && apple->y == current->y)
+				if (apple->x == current->x && apple->y == current->y) {
 					ok = 0;
-				else
-					ok = 1;
+					break;
+				}
 				
 				previous = current;
 				current = current->next;
 			}
+			
+			if (ok)
+				break;
 		}
         
         // Add body parts
