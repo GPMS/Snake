@@ -56,16 +56,20 @@ int processEvents(SDL_Window *window, GameState *game)
                         game->running = SDL_FALSE;
                         break;
                     case SDLK_UP:
-                        game->direction = NORTH;
+                    	if (game->parts == 1 || game->direction != SOUTH)
+                        	game->direction = NORTH;
                         break;
                     case SDLK_DOWN:
-                        game->direction = SOUTH;
+                        if (game->parts == 1 || game->direction != NORTH)
+                        	game->direction = SOUTH;
                         break;
                     case SDLK_RIGHT:
-                        game->direction = EAST;
+                    	if (game->parts == 1 || game->direction != WEST)
+                        	game->direction = EAST;
                         break;
                     case SDLK_LEFT:
-                        game->direction = WEST;
+                        if (game->parts == 1 || game->direction != EAST)
+                        	game->direction = WEST;
                         break;
                 }
                 break;
