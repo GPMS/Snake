@@ -259,6 +259,19 @@ Body *newBody(Body *tail)
 }
 
 
+void deleteSnake(Body *head)
+{
+	Body *freeMe = head;
+	Body *holdMe = NULL;
+	
+	while(freeMe != NULL) {
+		holdMe = freeMe->next;
+		free(freeMe);
+		freeMe = holdMe;
+	}
+}
+
+
 int main(int argc, char **argv)
 {
     GameState game;
@@ -314,7 +327,8 @@ int main(int argc, char **argv)
         SDL_Delay(120);
     }
     
-    free(head);
+    deleteSnake(head);
+    
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     
