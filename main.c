@@ -300,7 +300,7 @@ int main(int argc, char **argv)
     srandom((int)time(NULL));
     
     game.direction = EAST;
-    game.parts = 1;
+    game.parts = 3;
     game.partsDrawn = 1;
     
     head->x = 8 * BLOCK_SIZE;
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
     while (game.running) {
         processEvents(window, &game);
         
-        if (game.parts != game.partsDrawn) {
+        while (game.partsDrawn < game.parts) {
             tail = newBody(tail);
             game.partsDrawn++;
         }
