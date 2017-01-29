@@ -35,6 +35,81 @@ typedef struct{
 } GameState;
 
 
+int processEvents(SDL_Window *window, GameState *game);
+void doRender(SDL_Renderer *renderer, Body *head, Apple apple);
+void moveSnake(GameState game, Body *head);
+int collision2D(int x1, int y1, int x2, int y2);
+void collisionCheck(GameState *game, Body *head, Apple *apple);
+Body *newBody(Body *tail);
+void deleteSnake(Body *head);
+
+
+int main(int argc, char **argv)
+{
+    GameState game;
+
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    
+    SDL_Init(SDL_INIT_VIDEO);
+    
+    window = SDL_CreateWindow("Game Window",
+                              SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED,
+                              640, 480,
+                              0
+                             );
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    
+    game.running = SDL_TRUE;
+    
+    Body *head = NULL;
+    Body *tail = NULL;
+    
+    head = malloc(sizeof(Body));
+    tail = head;
+    
+    srandom((int)time(NULL));
+    
+    game.direction = EAST;
+    game.parts = 3;
+    game.partsDrawn = 1;
+    
+    head->x = 8 * BLOCK_SIZE;
+    head->y = 8 * BLOCK_SIZE;
+    head->next = NULL;
+    
+    Apple apple;
+    apple.x = 2*BLOCK_SIZE;
+    apple.y = 8*BLOCK_SIZE;
+
+    /* Event loop */
+    while (game.running) {
+        processEvents(window, &game);
+        
+        while (game.partsDrawn < game.parts) {
+            tail = newBody(tail);
+            game.partsDrawn++;
+        }
+        
+        doRender(renderer, head, apple);
+        moveSnake(game, head);
+        collisionCheck(&game, head, &apple);
+        
+        SDL_Delay(120);
+    }
+    
+    deleteSnake(head);
+    
+    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(renderer);
+    
+    SDL_Quit();
+    
+    return 0;
+}
+
+
 int processEvents(SDL_Window *window, GameState *game)
 {
     SDL_Event event;
@@ -269,70 +344,4 @@ void deleteSnake(Body *head)
         free(freeMe);
         freeMe = holdMe;
     }
-}
-
-
-int main(int argc, char **argv)
-{
-    GameState game;
-
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    
-    SDL_Init(SDL_INIT_VIDEO);
-    
-    window = SDL_CreateWindow("Game Window",
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              640, 480,
-                              0
-                             );
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    
-    game.running = SDL_TRUE;
-    
-    Body *head = NULL;
-    Body *tail = NULL;
-    
-    head = malloc(sizeof(Body));
-    tail = head;
-    
-    srandom((int)time(NULL));
-    
-    game.direction = EAST;
-    game.parts = 3;
-    game.partsDrawn = 1;
-    
-    head->x = 8 * BLOCK_SIZE;
-    head->y = 8 * BLOCK_SIZE;
-    head->next = NULL;
-    
-    Apple apple;
-    apple.x = 2*BLOCK_SIZE;
-    apple.y = 8*BLOCK_SIZE;
-
-    /* Event loop */
-    while (game.running) {
-        processEvents(window, &game);
-        
-        while (game.partsDrawn < game.parts) {
-            tail = newBody(tail);
-            game.partsDrawn++;
-        }
-        
-        doRender(renderer, head, apple);
-        moveSnake(game, head);
-        collisionCheck(&game, head, &apple);
-        
-        SDL_Delay(120);
-    }
-    
-    deleteSnake(head);
-    
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
-    
-    SDL_Quit();
-    
-    return 0;
 }
