@@ -3,6 +3,8 @@
 #include <time.h>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 
 #define WIDTH       26 // BLOCK_SIZEs
@@ -31,13 +33,17 @@ typedef struct{
     int parts;
     int partsDrawn;
     int score;
+    
+    SDL_Texture *label;
+    TTF_Font *font;
 
 } GameState;
 
 
 int processEvents(SDL_Window *window, GameState *game);
-void doRender(SDL_Renderer *renderer, Body *head, Apple apple);
+void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game);
 void moveSnake(GameState game, Body *head);
+unsigned int randr(unsigned int min, unsigned int max);
 void collisionCheck(GameState *game, Body *head, Apple *apple);
 Body *newBody(Body *tail);
 void deleteSnake(Body *head);
@@ -51,6 +57,7 @@ int main(int argc, char **argv)
     SDL_Renderer *renderer;
     
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
     
     window = SDL_CreateWindow("Game Window",
                               SDL_WINDOWPOS_UNDEFINED,
@@ -73,6 +80,15 @@ int main(int argc, char **argv)
     game.direction = EAST;
     game.parts = 3;
     game.partsDrawn = 1;
+    game.score = 0;
+    
+    game.font = NULL;
+    game.font = TTF_OpenFont("emulogic.ttf", 24);
+    if (game.font == NULL) {
+    	printf("COULD NOT FIND FONT FILE!\n");
+    	SDL_Quit();
+    	return 1;
+    }
     
     head->xGrid = 5;
     head->yGrid = 10;
@@ -91,7 +107,7 @@ int main(int argc, char **argv)
             game.partsDrawn++;
         }
         
-        doRender(renderer, head, apple);
+        doRender(renderer, head, apple, &game);
         moveSnake(game, head);
         collisionCheck(&game, head, &apple);
         
@@ -99,6 +115,9 @@ int main(int argc, char **argv)
     }
     
     deleteSnake(head);
+    
+    SDL_DestroyTexture(game.label);
+    TTF_CloseFont(game.font);
     
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
@@ -158,7 +177,7 @@ int processEvents(SDL_Window *window, GameState *game)
 }
 
 
-void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
+void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
 {
     /* Draw black background */
     SDL_SetRenderDrawColor(renderer,
@@ -166,6 +185,18 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                            255
                           );
     SDL_RenderClear(renderer);
+    
+    /* Draw score */
+    SDL_Color white = {255, 255, 255, 255};
+    
+    char str[128] = "";
+    sprintf(str, "score:%d", game->score);
+    
+    SDL_Surface *tmp = TTF_RenderText_Blended(game->font, str, white);
+    game->label = SDL_CreateTextureFromSurface(renderer, tmp);
+    SDL_Rect textRect = {BLOCK_SIZE, BLOCK_SIZE, tmp->w, tmp->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
+    SDL_FreeSurface(tmp);
     
     /* Draw main screen */
     SDL_SetRenderDrawColor(renderer,
@@ -256,11 +287,15 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
 {   
     /* Apple collision */
     if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
+        
+        if (game->score < 1000000)
+        	game->score += 10;
+        
+        
         while (1) {
             // Change apple location
             apple->xGrid = randr(2, WIDTH-3);
             apple->yGrid = randr(3, HEIGHT-2);
-            printf("xGrid: %d\tyGrid: %d\n", apple->xGrid, apple->yGrid);
             
             // Check if location doesn't overlap with the snake
             int ok = 1;
