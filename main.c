@@ -284,8 +284,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
                 break;
         }
         
-        // Add body parts
-        game->parts++;
+        game->parts++;	// Add body parts
     }
     
     /* Body collision */
@@ -304,18 +303,24 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     }
     
     /* Outside boundary */
-    int outside = 0;
     
-    //up or down
-    if (head->y < 0 || (head->y + BLOCK_SIZE) > HEIGHT)
-        outside = 1;
-    //right or left
-    if ((head->x + BLOCK_SIZE) > WIDTH || head->x < 0)
-        outside = 1;
-    
-    if (outside) {
-        printf("GAME OVER\n");
-        game->running = SDL_FALSE;
+    // up
+    if (head->y < 0) {
+		head->pastY = head->y;
+        head->y = HEIGHT;
+    // down
+    } else if ((head->y + BLOCK_SIZE) > HEIGHT) {
+		head->pastY = head->y;
+        head->y -= HEIGHT;
+    }
+    // right
+    if ((head->x + BLOCK_SIZE) > WIDTH) {
+		head->pastX = head->x;
+        head->x -= WIDTH;
+    // left
+    } else if (head->x < 0) {
+    	head->pastX = head->x;
+        head->x = WIDTH;
     }
 }
 
