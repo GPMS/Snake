@@ -5,8 +5,8 @@
 #include <SDL2/SDL.h>
 
 
-#define WIDTH       640
-#define HEIGHT      480
+#define WIDTH		20 // BLOCK_SIZEs
+#define HEIGHT		20 // BLOCK_SIZEs	
 #define NAME        "Snake"
 #define BLOCK_SIZE  25
 
@@ -14,13 +14,13 @@
 enum dir { NORTH, EAST, WEST, SOUTH };
 
 typedef struct Body{
-    int pastX, pastY;
-    int x, y;
+    int pastXGrid, pastYGrid;
+    int xGrid, yGrid;
     struct Body *next;
 } Body;
 
 typedef struct{
-    int x, y;
+    int xGrid, yGrid;
 } Apple;
 
 typedef struct{
@@ -38,7 +38,6 @@ typedef struct{
 int processEvents(SDL_Window *window, GameState *game);
 void doRender(SDL_Renderer *renderer, Body *head, Apple apple);
 void moveSnake(GameState game, Body *head);
-int collision2D(int x1, int y1, int x2, int y2);
 void collisionCheck(GameState *game, Body *head, Apple *apple);
 Body *newBody(Body *tail);
 void deleteSnake(Body *head);
@@ -47,7 +46,7 @@ void deleteSnake(Body *head);
 int main(int argc, char **argv)
 {
     GameState game;
-
+	
     SDL_Window *window;
     SDL_Renderer *renderer;
     
@@ -56,7 +55,7 @@ int main(int argc, char **argv)
     window = SDL_CreateWindow("Game Window",
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
-                              640, 480,
+                              WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE,
                               0
                              );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -75,13 +74,13 @@ int main(int argc, char **argv)
     game.parts = 3;
     game.partsDrawn = 1;
     
-    head->x = 8 * BLOCK_SIZE;
-    head->y = 8 * BLOCK_SIZE;
+    head->xGrid = 5;
+    head->yGrid = 10;
     head->next = NULL;
     
     Apple apple;
-    apple.x = 2*BLOCK_SIZE;
-    apple.y = 8*BLOCK_SIZE;
+    apple.xGrid = 2;
+    apple.yGrid = 10;
 
     /* Event loop */
     while (game.running) {
@@ -173,7 +172,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                        255, 0, 0,
                        255
                       );
-    SDL_Rect appleRect = { apple.x, apple.y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
+    SDL_Rect appleRect = { apple.xGrid*BLOCK_SIZE , apple.yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
@@ -187,7 +186,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
     
     // Draw snake
     while (current != NULL){
-        SDL_Rect snakeRect = { current->x, current->y, BLOCK_SIZE-5, BLOCK_SIZE-5 };
+        SDL_Rect snakeRect = { current->xGrid*BLOCK_SIZE , current->yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
         SDL_RenderFillRect(renderer, &snakeRect);
         
         current = current->next;
@@ -202,24 +201,24 @@ void moveSnake(GameState game, Body *head)
     /* Move Head */
     switch(game.direction) {
         case NORTH:
-            head->pastY = head->y;
-            head->pastX = head->x;
-            head->y -= BLOCK_SIZE;
+            head->pastYGrid = head->yGrid;
+            head->pastXGrid = head->xGrid;
+            head->yGrid--;
             break;
         case SOUTH:
-            head->pastY = head->y;
-            head->pastX = head->x;
-            head->y += BLOCK_SIZE;
+            head->pastYGrid = head->yGrid;
+            head->pastXGrid = head->xGrid;
+            head->yGrid++;
             break;
         case EAST:
-            head->pastY = head->y;
-            head->pastX = head->x;
-            head->x += BLOCK_SIZE;
+            head->pastYGrid = head->yGrid;
+            head->pastXGrid = head->xGrid;
+            head->xGrid++;
             break;
         case WEST:
-            head->pastY = head->y;
-            head->pastX = head->x;
-            head->x -= BLOCK_SIZE;
+            head->pastYGrid = head->yGrid;
+            head->pastXGrid = head->xGrid;
+            head->xGrid--;
             break;
     }
     
@@ -228,10 +227,10 @@ void moveSnake(GameState game, Body *head)
     Body *previous = head;
     
     while (current != NULL) {
-        current->pastX = current->x;
-        current->x = previous->pastX;
-        current->pastY = current->y;
-        current->y = previous->pastY;
+        current->pastXGrid = current->xGrid;
+        current->xGrid = previous->pastXGrid;
+        current->pastYGrid = current->yGrid;
+        current->yGrid = previous->pastYGrid;
         
         previous = current;
         current = current->next;
@@ -239,39 +238,25 @@ void moveSnake(GameState game, Body *head)
 }
 
 
-int collision2D(int x1, int y1,
-                int x2, int y2)
-{
-    if ( (x1 == x2)  && (y1 == y2) ) {
-        return 1;
-    }
-    
-    return 0;
-}
-
-
 void collisionCheck(GameState *game, Body *head, Apple *apple)
-{
-    int blockX = WIDTH / BLOCK_SIZE;
-    int blockY = HEIGHT / BLOCK_SIZE;
-    
+{   
     /* Apple collision */
-    if (collision2D(head->x, head->y, apple->x, apple->y)) {
+    if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
         while (1) {
             // Change apple location
-            apple->x = (random() % blockX) * BLOCK_SIZE;
-            apple->y = (random() % blockY) * BLOCK_SIZE;
+            apple->xGrid = random() % WIDTH;
+            apple->yGrid = random() % HEIGHT;
             
             // Check if location doesn't overlap with the snake
             int ok = 1;
-            if (apple->x == head->x && apple->y == head->y)
+            if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) )
                 ok = 0;
             
             Body *current = head;
             Body *previous = head;
         
             while(current != NULL) {
-                if (apple->x == current->x && apple->y == current->y) {
+                if ( (apple->xGrid == current->xGrid) && (apple->yGrid == current->yGrid) ) {
                     ok = 0;
                     break;
                 }
@@ -280,8 +265,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
                 current = current->next;
             }
             
-            if (ok)
-                break;
+            if (ok)	break;
         }
         
         game->parts++;	// Add body parts
@@ -292,7 +276,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     Body *previous = head->next;
     
     while (current != NULL) {
-        if (collision2D(head->x, head->y, current->x, current->y)) {
+        if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) ) {
             printf("GAME OVER\n");
             game->running = SDL_FALSE;
             break;
@@ -305,22 +289,22 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     /* Outside boundary */
     
     // up
-    if (head->y < 0) {
-		head->pastY = head->y;
-        head->y = HEIGHT;
+    if (head->yGrid < 0) {
+		head->pastYGrid = head->yGrid;
+        head->yGrid = HEIGHT-1;
     // down
-    } else if ((head->y + BLOCK_SIZE) > HEIGHT) {
-		head->pastY = head->y;
-        head->y -= HEIGHT;
+    } else if (head->yGrid > HEIGHT-1) {
+		head->pastYGrid = head->yGrid;
+        head->yGrid = 0;
     }
     // right
-    if ((head->x + BLOCK_SIZE) > WIDTH) {
-		head->pastX = head->x;
-        head->x -= WIDTH;
+    if (head->xGrid > WIDTH-1) {
+		head->pastXGrid = head->xGrid;
+        head->xGrid = 0;
     // left
-    } else if (head->x < 0) {
-    	head->pastX = head->x;
-        head->x = WIDTH;
+    } else if (head->xGrid < 0) {
+    	head->pastXGrid = head->xGrid;
+        head->xGrid = WIDTH-1;
     }
 }
 
@@ -332,8 +316,8 @@ Body *newBody(Body *tail)
     tail->next = newBody;
     
     newBody->next = NULL;
-    newBody->x = tail-> pastX;
-    newBody->y = tail-> pastY;
+    newBody->xGrid = tail-> pastXGrid;
+    newBody->yGrid = tail-> pastYGrid;
     
     return newBody;
 }
