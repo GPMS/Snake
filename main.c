@@ -5,8 +5,8 @@
 #include <SDL2/SDL.h>
 
 
-#define WIDTH       20 // BLOCK_SIZEs
-#define HEIGHT      20 // BLOCK_SIZEs   
+#define WIDTH       26 // BLOCK_SIZEs
+#define HEIGHT      26 // BLOCK_SIZEs   
 #define NAME        "Snake"
 #define BLOCK_SIZE  25
 
@@ -167,12 +167,20 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
                           );
     SDL_RenderClear(renderer);
     
+    /* Draw main screen */
+    SDL_SetRenderDrawColor(renderer,
+                           50, 50, 50,
+                           255
+                          );
+    SDL_Rect mainScreen = { 2*BLOCK_SIZE, 3*BLOCK_SIZE, 22*BLOCK_SIZE, 22*BLOCK_SIZE };
+    SDL_RenderFillRect(renderer, &mainScreen);
+    
     /* Draw apple */
     SDL_SetRenderDrawColor(renderer,
                        255, 0, 0,
                        255
                       );
-    SDL_Rect appleRect = { apple.xGrid*BLOCK_SIZE , apple.yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
+    SDL_Rect appleRect = { apple.xGrid*BLOCK_SIZE, apple.yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
@@ -186,7 +194,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple)
     
     // Draw snake
     while (current != NULL){
-        SDL_Rect snakeRect = { current->xGrid*BLOCK_SIZE , current->yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
+        SDL_Rect snakeRect = { current->xGrid*BLOCK_SIZE, current->yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
         SDL_RenderFillRect(renderer, &snakeRect);
         
         current = current->next;
@@ -237,6 +245,12 @@ void moveSnake(GameState game, Body *head)
     }
 }
 
+unsigned int randr(unsigned int min, unsigned int max)
+{
+       double scaled = (double)rand()/RAND_MAX;
+
+       return (max - min +1)*scaled + min;
+}
 
 void collisionCheck(GameState *game, Body *head, Apple *apple)
 {   
@@ -244,8 +258,9 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
         while (1) {
             // Change apple location
-            apple->xGrid = random() % WIDTH;
-            apple->yGrid = random() % HEIGHT;
+            apple->xGrid = randr(2, WIDTH-3);
+            apple->yGrid = randr(3, HEIGHT-2);
+            printf("xGrid: %d\tyGrid: %d\n", apple->xGrid, apple->yGrid);
             
             // Check if location doesn't overlap with the snake
             int ok = 1;
@@ -289,22 +304,22 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     /* Outside boundary */
     
     // up
-    if (head->yGrid < 0) {
+    if (head->yGrid < 3) {
         head->pastYGrid = head->yGrid;
-        head->yGrid = HEIGHT-1;
+        head->yGrid = HEIGHT-2;
     // down
-    } else if (head->yGrid > HEIGHT-1) {
+    } else if (head->yGrid > HEIGHT-2) {
         head->pastYGrid = head->yGrid;
-        head->yGrid = 0;
+        head->yGrid = 3;
     }
     // right
-    if (head->xGrid > WIDTH-1) {
+    if (head->xGrid > WIDTH-3) {
         head->pastXGrid = head->xGrid;
-        head->xGrid = 0;
+        head->xGrid = 2;
     // left
-    } else if (head->xGrid < 0) {
+    } else if (head->xGrid < 2) {
         head->pastXGrid = head->xGrid;
-        head->xGrid = WIDTH-1;
+        head->xGrid = WIDTH-3;
     }
 }
 
