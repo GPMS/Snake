@@ -5,8 +5,8 @@
 #include <SDL2/SDL.h>
 
 
-#define WIDTH		20 // BLOCK_SIZEs
-#define HEIGHT		20 // BLOCK_SIZEs	
+#define WIDTH       20 // BLOCK_SIZEs
+#define HEIGHT      20 // BLOCK_SIZEs   
 #define NAME        "Snake"
 #define BLOCK_SIZE  25
 
@@ -46,7 +46,7 @@ void deleteSnake(Body *head);
 int main(int argc, char **argv)
 {
     GameState game;
-	
+    
     SDL_Window *window;
     SDL_Renderer *renderer;
     
@@ -265,10 +265,10 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
                 current = current->next;
             }
             
-            if (ok)	break;
+            if (ok) break;
         }
         
-        game->parts++;	// Add body parts
+        game->parts++;  // Add body parts
     }
     
     /* Body collision */
@@ -290,20 +290,20 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     
     // up
     if (head->yGrid < 0) {
-		head->pastYGrid = head->yGrid;
+        head->pastYGrid = head->yGrid;
         head->yGrid = HEIGHT-1;
     // down
     } else if (head->yGrid > HEIGHT-1) {
-		head->pastYGrid = head->yGrid;
+        head->pastYGrid = head->yGrid;
         head->yGrid = 0;
     }
     // right
     if (head->xGrid > WIDTH-1) {
-		head->pastXGrid = head->xGrid;
+        head->pastXGrid = head->xGrid;
         head->xGrid = 0;
     // left
     } else if (head->xGrid < 0) {
-    	head->pastXGrid = head->xGrid;
+        head->pastXGrid = head->xGrid;
         head->xGrid = WIDTH-1;
     }
 }
