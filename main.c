@@ -6,11 +6,11 @@
 #include <SDL2/SDL_ttf.h>
 
 
-#define WIDTH       	26	// BLOCK_SIZEs
-#define HEIGHT      	26	// BLOCK_SIZEs
-#define NAME        	"Snake"
-#define BLOCK_SIZE  	25
-#define INITIAL_SIZE	3	// How many parts the snake starts with
+#define WIDTH           26  // BLOCK_SIZEs
+#define HEIGHT          26  // BLOCK_SIZEs
+#define NAME            "Snake"
+#define BLOCK_SIZE      25
+#define INITIAL_SIZE    3   // How many parts the snake starts with
 
 
 int done = 0;
@@ -90,16 +90,16 @@ int main(int argc, char **argv)
     game.font = NULL;
     game.font = TTF_OpenFont("emulogic.ttf", 24);
     if (game.font == NULL) {
-    	printf("COULD NOT FIND FONT FILE!\n");
-    	SDL_Quit();
-    	return 1;
+        printf("COULD NOT FIND FONT FILE!\n");
+        SDL_Quit();
+        return 1;
     }
     
     head->xGrid = 5;
     head->yGrid = 10;
     head->next = NULL;
     
-    Apple apple;	
+    Apple apple;    
     apple.xGrid = 2;
     apple.yGrid = 10;
 
@@ -108,19 +108,19 @@ int main(int argc, char **argv)
         processEvents(window, &game);
         
         if (game.state == GAME) {
-			while (game.partsDrawn < game.parts) {
-				tail = newBody(tail);
-				game.partsDrawn++;
-			}
-			moveSnake(game, head);
-			collisionCheck(&game, head, &apple);
-		}
-		
-		doRender(renderer, head, apple, &game);
-		
-		SDL_Delay(100);
+            while (game.partsDrawn < game.parts) {
+                tail = newBody(tail);
+                game.partsDrawn++;
+            }
+            moveSnake(game, head);
+            collisionCheck(&game, head, &apple);
+        }
+        
+        doRender(renderer, head, apple, &game);
+        
+        SDL_Delay(100);
 
-		done = 0;
+        done = 0;
     }
     
     deleteSnake(head);
@@ -158,12 +158,12 @@ int processEvents(SDL_Window *window, GameState *game)
                         game->running = SDL_FALSE;
                         break;
                     case SDLK_p:
-                    	if (game->state == GAME)
-                    		game->state = PAUSE;
-                    	else if (game->state == PAUSE)
-                    		game->state = GAME;
-                    	
-                    	break;
+                        if (game->state == GAME)
+                            game->state = PAUSE;
+                        else if (game->state == PAUSE)
+                            game->state = GAME;
+                        
+                        break;
                     case SDLK_UP:
                         if ((game->parts == 1 || game->direction != SOUTH) && done == 0) {
                             game->direction = NORTH;
@@ -283,7 +283,7 @@ SDL_Renderer *drawPause(SDL_Renderer *renderer, GameState *game)
 
 SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game)
 {
-	/* Draw black background */
+    /* Draw black background */
     SDL_SetRenderDrawColor(renderer,
                            0, 0, 0,
                            255
@@ -305,16 +305,16 @@ SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game)
 
 void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
 {
-	switch(game->state) {
-		case GAME:
-    		renderer = drawGame(renderer, head, apple, game);
-    		break;
-    	case PAUSE:
-    		renderer = drawPause(renderer, game);
-    		break;
-    	case GAMEOVER:
-    		renderer = drawGameOver(renderer, game);
-    		break;
+    switch(game->state) {
+        case GAME:
+            renderer = drawGame(renderer, head, apple, game);
+            break;
+        case PAUSE:
+            renderer = drawPause(renderer, game);
+            break;
+        case GAMEOVER:
+            renderer = drawGameOver(renderer, game);
+            break;
     }
     SDL_RenderPresent(renderer);
 }
@@ -374,7 +374,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
         
         if (game->score < WIDTH*HEIGHT*10-INITIAL_SIZE+1*10)
-        	game->score += 10;
+            game->score += 10;
         
         while (1) {
             // Change apple location
