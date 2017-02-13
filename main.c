@@ -157,6 +157,13 @@ int processEvents(SDL_Window *window, GameState *game)
                     case SDLK_ESCAPE:
                         game->running = SDL_FALSE;
                         break;
+                    case SDLK_p:
+                    	if (game->state == GAME)
+                    		game->state = PAUSE;
+                    	else if (game->state == PAUSE)
+                    		game->state = GAME;
+                    	
+                    	break;
                     case SDLK_UP:
                         if ((game->parts == 1 || game->direction != SOUTH) && done == 0) {
                             game->direction = NORTH;
@@ -253,6 +260,27 @@ SDL_Renderer *drawGame(SDL_Renderer *renderer, Body *head, Apple apple, GameStat
 }
 
 
+SDL_Renderer *drawPause(SDL_Renderer *renderer, GameState *game)
+{
+    SDL_Color white = {255, 255, 255, 255};
+    
+    /* Write 'Pause' */
+    SDL_Surface *tmp1 = TTF_RenderText_Blended(game->font, "PAUSED", white);
+    game->label = SDL_CreateTextureFromSurface(renderer, tmp1);
+    SDL_Rect pauseRect = {10 * BLOCK_SIZE, 5 * BLOCK_SIZE, tmp1->w, tmp1->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &pauseRect);
+    SDL_FreeSurface(tmp1);
+    /* Write instructions */
+    SDL_Surface *tmp2 = TTF_RenderText_Blended(game->font, "Press p to continue", white);
+    game->label = SDL_CreateTextureFromSurface(renderer, tmp2);
+    SDL_Rect textRect = {4 * BLOCK_SIZE, 10 * BLOCK_SIZE, tmp2->w, tmp2->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
+    SDL_FreeSurface(tmp2);
+    
+    return renderer;
+}
+
+
 SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game)
 {
 	/* Draw black background */
@@ -262,7 +290,7 @@ SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game)
                           );
     SDL_RenderClear(renderer);
     
-    /* Draw gameover */
+    /* Write gameover */
     SDL_Color white = {255, 255, 255, 255};
     
     SDL_Surface *tmp = TTF_RenderText_Blended(game->font, "GameOver", white);
@@ -282,6 +310,7 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
     		renderer = drawGame(renderer, head, apple, game);
     		break;
     	case PAUSE:
+    		renderer = drawPause(renderer, game);
     		break;
     	case GAMEOVER:
     		renderer = drawGameOver(renderer, game);
