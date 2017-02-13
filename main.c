@@ -3,17 +3,20 @@
 #include <time.h>
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 
 
-#define WIDTH       26 // BLOCK_SIZEs
-#define HEIGHT      26 // BLOCK_SIZEs   
-#define NAME        "Snake"
-#define BLOCK_SIZE  25
+#define WIDTH       	26	// BLOCK_SIZEs
+#define HEIGHT      	26	// BLOCK_SIZEs
+#define NAME        	"Snake"
+#define BLOCK_SIZE  	25
+#define INITIAL_SIZE	3	// How many parts the snake starts with
 
+
+int done = 0;
 
 enum dir { NORTH, EAST, WEST, SOUTH };
+enum state { GAME, PAUSE, GAMEOVER };
 
 typedef struct Body{
     int pastXGrid, pastYGrid;
@@ -27,6 +30,7 @@ typedef struct{
 
 typedef struct{
     SDL_bool running;
+    int state;
     
     /* Player */
     int direction;
@@ -52,6 +56,7 @@ void deleteSnake(Body *head);
 int main(int argc, char **argv)
 {
     GameState game;
+    game.state = GAME;
     
     SDL_Window *window;
     SDL_Renderer *renderer;
@@ -78,7 +83,7 @@ int main(int argc, char **argv)
     srandom((int)time(NULL));
     
     game.direction = EAST;
-    game.parts = 3;
+    game.parts = INITIAL_SIZE;
     game.partsDrawn = 1;
     game.score = 0;
     
@@ -94,7 +99,7 @@ int main(int argc, char **argv)
     head->yGrid = 10;
     head->next = NULL;
     
-    Apple apple;
+    Apple apple;	
     apple.xGrid = 2;
     apple.yGrid = 10;
 
@@ -102,16 +107,20 @@ int main(int argc, char **argv)
     while (game.running) {
         processEvents(window, &game);
         
-        while (game.partsDrawn < game.parts) {
-            tail = newBody(tail);
-            game.partsDrawn++;
-        }
-        
-        doRender(renderer, head, apple, &game);
-        moveSnake(game, head);
-        collisionCheck(&game, head, &apple);
-        
-        SDL_Delay(120);
+        if (game.state == GAME) {
+			while (game.partsDrawn < game.parts) {
+				tail = newBody(tail);
+				game.partsDrawn++;
+			}
+			moveSnake(game, head);
+			collisionCheck(&game, head, &apple);
+		}
+		
+		doRender(renderer, head, apple, &game);
+		
+		SDL_Delay(100);
+
+		done = 0;
     }
     
     deleteSnake(head);
@@ -128,11 +137,11 @@ int main(int argc, char **argv)
 }
 
 
+
 int processEvents(SDL_Window *window, GameState *game)
 {
     SDL_Event event;
-    int done = 0;
-    
+
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_WINDOWEVENT_CLOSE:
@@ -149,20 +158,28 @@ int processEvents(SDL_Window *window, GameState *game)
                         game->running = SDL_FALSE;
                         break;
                     case SDLK_UP:
-                        if (game->parts == 1 || game->direction != SOUTH)
+                        if ((game->parts == 1 || game->direction != SOUTH) && done == 0) {
                             game->direction = NORTH;
+                            done = 1;
+                        }
                         break;
                     case SDLK_DOWN:
-                        if (game->parts == 1 || game->direction != NORTH)
+                        if ((game->parts == 1 || game->direction != NORTH) && done == 0) {
                             game->direction = SOUTH;
+                            done = 1;
+                        }
                         break;
                     case SDLK_RIGHT:
-                        if (game->parts == 1 || game->direction != WEST)
+                        if ((game->parts == 1 || game->direction != WEST) && done ==  0){
                             game->direction = EAST;
+                            done = 1;
+                        }
                         break;
                     case SDLK_LEFT:
-                        if (game->parts == 1 || game->direction != EAST)
+                        if ((game->parts == 1 || game->direction != EAST) && done == 0) {
                             game->direction = WEST;
+                            done = 1;
+                        }
                         break;
                 }
                 break;
@@ -177,7 +194,7 @@ int processEvents(SDL_Window *window, GameState *game)
 }
 
 
-void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
+SDL_Renderer *drawGame(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
 {
     /* Draw black background */
     SDL_SetRenderDrawColor(renderer,
@@ -231,6 +248,45 @@ void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
         current = current->next;
     }
     
+    return renderer;
+
+}
+
+
+SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game)
+{
+	/* Draw black background */
+    SDL_SetRenderDrawColor(renderer,
+                           0, 0, 0,
+                           255
+                          );
+    SDL_RenderClear(renderer);
+    
+    /* Draw gameover */
+    SDL_Color white = {255, 255, 255, 255};
+    
+    SDL_Surface *tmp = TTF_RenderText_Blended(game->font, "GameOver", white);
+    game->label = SDL_CreateTextureFromSurface(renderer, tmp);
+    SDL_Rect textRect = {9 * BLOCK_SIZE, 5 * BLOCK_SIZE, tmp->w, tmp->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
+    SDL_FreeSurface(tmp);
+    
+    return renderer;
+}
+
+
+void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game)
+{
+	switch(game->state) {
+		case GAME:
+    		renderer = drawGame(renderer, head, apple, game);
+    		break;
+    	case PAUSE:
+    		break;
+    	case GAMEOVER:
+    		renderer = drawGameOver(renderer, game);
+    		break;
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -288,9 +344,8 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     /* Apple collision */
     if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
         
-        if (game->score < 1000000)
+        if (game->score < WIDTH*HEIGHT*10-INITIAL_SIZE+1*10)
         	game->score += 10;
-        
         
         while (1) {
             // Change apple location
@@ -327,8 +382,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     
     while (current != NULL) {
         if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) ) {
-            printf("GAME OVER\n");
-            game->running = SDL_FALSE;
+            game->state = GAMEOVER;
             break;
         }
         
