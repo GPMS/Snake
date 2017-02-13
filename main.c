@@ -45,6 +45,9 @@ typedef struct{
 
 
 int processEvents(SDL_Window *window, GameState *game);
+SDL_Renderer *drawGame(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game);
+SDL_Renderer *drawPause(SDL_Renderer *renderer, GameState *game);
+SDL_Renderer *drawGameOver(SDL_Renderer *renderer, GameState *game);
 void doRender(SDL_Renderer *renderer, Body *head, Apple apple, GameState *game);
 void moveSnake(GameState game, Body *head);
 unsigned int randr(unsigned int min, unsigned int max);
