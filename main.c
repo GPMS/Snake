@@ -10,7 +10,7 @@
 #define HEIGHT          26  // BLOCK_SIZEs
 #define NAME            "Snake"
 #define BLOCK_SIZE      25
-#define INITIAL_SIZE    3   // How many parts the snake starts with
+#define INITIAL_SIZE    4   // How many parts the snake starts with
 
 
 int done = 0;
