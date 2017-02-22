@@ -1,2 +1,2 @@
 # SnakeSDL
-A Snake implementation using SDL and C.
+A Snake game in C using SDL2.
