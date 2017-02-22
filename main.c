@@ -265,20 +265,46 @@ SDL_Renderer *drawGame(SDL_Renderer *renderer, Body *head, Apple apple, GameStat
 
 SDL_Renderer *drawPause(SDL_Renderer *renderer, GameState *game)
 {
+	/* Clear playground */
+	// Draw black background
+    SDL_SetRenderDrawColor(renderer,
+                           0, 0, 0,
+                           255
+                          );
+    SDL_RenderClear(renderer);
+    
+    // Draw score
     SDL_Color white = {255, 255, 255, 255};
     
-    /* Write 'Pause' */
-    SDL_Surface *tmp1 = TTF_RenderText_Blended(game->font, "PAUSED", white);
+    char str[128] = "";
+    sprintf(str, "score:%d", game->score);
+    
+    SDL_Surface *tmp1 = TTF_RenderText_Blended(game->font, str, white);
     game->label = SDL_CreateTextureFromSurface(renderer, tmp1);
-    SDL_Rect pauseRect = {10 * BLOCK_SIZE, 5 * BLOCK_SIZE, tmp1->w, tmp1->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &pauseRect);
+    SDL_Rect scoreRect = {BLOCK_SIZE, BLOCK_SIZE, tmp1->w, tmp1->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &scoreRect);
     SDL_FreeSurface(tmp1);
-    /* Write instructions */
-    SDL_Surface *tmp2 = TTF_RenderText_Blended(game->font, "Press p to continue", white);
+    
+    // Draw main screen
+    SDL_SetRenderDrawColor(renderer,
+                           50, 50, 50,
+                           255
+                          );
+    SDL_Rect mainScreen = { 2*BLOCK_SIZE, 3*BLOCK_SIZE, 22*BLOCK_SIZE, 22*BLOCK_SIZE };
+    SDL_RenderFillRect(renderer, &mainScreen);
+    
+    /* Write 'Pause' */
+    SDL_Surface *tmp2 = TTF_RenderText_Blended(game->font, "PAUSED", white);
     game->label = SDL_CreateTextureFromSurface(renderer, tmp2);
-    SDL_Rect textRect = {4 * BLOCK_SIZE, 10 * BLOCK_SIZE, tmp2->w, tmp2->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
+    SDL_Rect pauseRect = {10 * BLOCK_SIZE, 5 * BLOCK_SIZE, tmp2->w, tmp2->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &pauseRect);
     SDL_FreeSurface(tmp2);
+    /* Write instructions */
+    SDL_Surface *tmp3 = TTF_RenderText_Blended(game->font, "Press p to continue", white);
+    game->label = SDL_CreateTextureFromSurface(renderer, tmp3);
+    SDL_Rect textRect = {4 * BLOCK_SIZE, 10 * BLOCK_SIZE, tmp3->w, tmp3->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
+    SDL_FreeSurface(tmp3);
     
     return renderer;
 }
