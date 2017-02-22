@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     game.score = 0;
     
     game.font = NULL;
-    game.font = TTF_OpenFont("emulogic.ttf", 24);
+    game.font = TTF_OpenFont("font/emulogic.ttf", 24);
     if (game.font == NULL) {
         printf("COULD NOT FIND FONT FILE!\n");
         SDL_Quit();
