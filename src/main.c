@@ -12,7 +12,7 @@
 
 int done = 0;
 
-int processEvents(SDL_Window *window, GameState *game);
+int processEvents(GameState *game);
 void moveSnake(GameState game, Body *head);
 unsigned int randr(unsigned int min, unsigned int max);
 void collisionCheck(GameState *game, Body *head, Apple *apple);
@@ -24,20 +24,24 @@ int main(int argc, char **argv)
 {
     GameState game;
     game.state = GAME;
+    game.asw = 3;
     
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    
+    for (int i=0; i < 5; i++) {
+    	//game.highScores[i].name = "???";
+    	game.highScores[i].value = 0;
+    }
     
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
     
-    window = SDL_CreateWindow("Game Window",
+    game.window = SDL_CreateWindow(GNAME,
                               SDL_WINDOWPOS_UNDEFINED,
                               SDL_WINDOWPOS_UNDEFINED,
                               WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE,
                               0
                              );
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_ACCELERATED);
     
     game.running = SDL_TRUE;
     
@@ -72,7 +76,7 @@ int main(int argc, char **argv)
 
     /* Event loop */
     while (game.running) {
-        processEvents(window, &game);
+        processEvents(&game);
         
         if (game.state == GAME) {
             while (game.partsDrawn < game.parts) {
@@ -83,7 +87,7 @@ int main(int argc, char **argv)
             collisionCheck(&game, head, &apple);
         }
         
-        doRender(renderer, head, apple, &game);
+        doRender(&game, head, apple);
         
         SDL_Delay(100);
 
@@ -95,8 +99,8 @@ int main(int argc, char **argv)
     SDL_DestroyTexture(game.label);
     TTF_CloseFont(game.font);
     
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(game.window);
+    SDL_DestroyRenderer(game.renderer);
     
     SDL_Quit();
     
@@ -105,20 +109,19 @@ int main(int argc, char **argv)
 
 
 
-int processEvents(SDL_Window *window, GameState *game)
+int processEvents(GameState *game)
 {
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_WINDOWEVENT_CLOSE:
-                if (window) {
-                    SDL_DestroyWindow(window);
-                    window = NULL;
+                if (game->window) {
+                    SDL_DestroyWindow(game->window);
+                    game->window = NULL;
                     game->running = SDL_FALSE;
                 }
                 break;
-        
             case SDL_KEYDOWN:
                 switch(event.key.keysym.sym) {
                     case SDLK_ESCAPE:
@@ -155,9 +158,16 @@ int processEvents(SDL_Window *window, GameState *game)
                             done = 1;
                         }
                         break;
+                    case SDLK_y:
+                        if (game->state == PROMPT)
+                            game->asw = 1;
+                        break;
+                    case SDLK_n:
+                        if (game->state == PROMPT)
+                            game->asw = 0;
+                        break;		
                 }
                 break;
-        
             case SDL_QUIT:
                 game->running = SDL_FALSE;
                 break;
@@ -221,7 +231,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     /* Apple collision */
     if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
         
-        if (game->score < WIDTH*HEIGHT*10-INITIAL_SIZE+1*10)
+        if (game->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
             game->score += 10;
         
         while (1) {

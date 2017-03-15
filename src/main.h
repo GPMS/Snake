@@ -3,13 +3,13 @@
 
 #define WIDTH           26  // BLOCK_SIZEs
 #define HEIGHT          26  // BLOCK_SIZEs
-#define NAME            "Snake"
+#define GNAME            "Snake"
 #define BLOCK_SIZE      25
 #define INITIAL_SIZE    4   // How many parts the snake starts with
 
 
 enum dir { NORTH, EAST, WEST, SOUTH };
-enum state { GAME, PAUSE, GAMEOVER };
+enum state { GAME, PAUSE, GAMEOVER, PROMPT, SAVE, BOARD };
 
 typedef struct Body{
     int pastXGrid, pastYGrid;
@@ -22,18 +22,30 @@ typedef struct{
 } Apple;
 
 typedef struct{
+	char name[4];
+	int value;
+} Score;
+
+typedef struct{
     SDL_bool running;
     int state;
+	
+	SDL_Window *window;
+    SDL_Renderer *renderer;
     
     /* Player */
     int direction;
     int parts;
     int partsDrawn;
     int score;
+    int asw;
+    Score highScores[5];
     
     SDL_Texture *label;
     TTF_Font *font;
 
 } GameState;
+
+int processEvents(GameState *game);
 
 #endif
