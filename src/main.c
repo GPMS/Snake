@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -28,7 +29,7 @@ int main(int argc, char **argv)
     
     
     for (int i=0; i < 5; i++) {
-    	//game.highScores[i].name = "???";
+    	strcpy(game.highScores[i].name, "???");
     	game.highScores[i].value = 0;
     }
     

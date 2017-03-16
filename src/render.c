@@ -123,60 +123,66 @@ SDL_Renderer *drawPause(GameState *game)
 SDL_Renderer *drawBoard(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color white = {255, 255, 255, 255};
+    SDL_Color lblue    =   { 51, 255, 255, 255};
+    SDL_Color yellow   =   {255, 255,   0, 255};
+    SDL_Color gray     =   {192, 192, 192, 255};
+    SDL_Color red      =   {255,   0,   0, 255};
+    SDL_Color orange   =   {255, 128,   0, 255};
+    SDL_Color lpink    =   {255, 153, 153, 255};
+    SDL_Color lorange  =   {255, 178, 102, 255};
     
     SDL_RenderClear(renderer);
     
-    SDL_Surface *title = TTF_RenderText_Blended(game->font, "Highscore Board", white);
+    SDL_Surface *title = TTF_RenderText_Blended(game->font, "Highscore Board", lblue);
     game->label = SDL_CreateTextureFromSurface(renderer, title);
     SDL_Rect titleRect = {(WIDTH*BLOCK_SIZE - title->w)/2, 2 * BLOCK_SIZE, title->w, title->h};
     SDL_RenderCopy(renderer, game->label, NULL, &titleRect);
     SDL_FreeSurface(title);
     
-    SDL_Surface *text = TTF_RenderText_Blended(game->font, "Place\tScore\tName", white);
+    SDL_Surface *text = TTF_RenderText_Blended(game->font, "Place\tScore\tName", yellow);
     game->label = SDL_CreateTextureFromSurface(renderer, text);
-    SDL_Rect textRect = {2, 4 * BLOCK_SIZE, text->w, text->h};
+    SDL_Rect textRect = {(WIDTH*BLOCK_SIZE - text->w)/2, 4 * BLOCK_SIZE, text->w, text->h};
     SDL_RenderCopy(renderer, game->label, NULL, &textRect);
     SDL_FreeSurface(text);
     
     char str[128] = "";
     sprintf(str, "  %d  \t%5d\t %s", 1, game->highScores[0].value, game->highScores[0].name);
     
-    SDL_Surface *place1 = TTF_RenderText_Blended(game->font, str, white);
+    SDL_Surface *place1 = TTF_RenderText_Blended(game->font, str, gray);
     game->label = SDL_CreateTextureFromSurface(renderer, place1);
-    SDL_Rect place1Rect = {2, 5 * BLOCK_SIZE, place1->w, place1->h};
+    SDL_Rect place1Rect = {(WIDTH*BLOCK_SIZE - place1->w)/2, 5 * BLOCK_SIZE, place1->w, place1->h};
     SDL_RenderCopy(renderer, game->label, NULL, &place1Rect);
     SDL_FreeSurface(place1);
     
     sprintf(str, "  %d  \t%5d\t %s", 2, game->highScores[1].value, game->highScores[1].name);
     
-    SDL_Surface *place2 = TTF_RenderText_Blended(game->font, str, white);
+    SDL_Surface *place2 = TTF_RenderText_Blended(game->font, str, red);
     game->label = SDL_CreateTextureFromSurface(renderer, place2);
-    SDL_Rect place2Rect = {2, 6 * BLOCK_SIZE, place2->w, place2->h};
+    SDL_Rect place2Rect = {(WIDTH*BLOCK_SIZE - place2->w)/2, 6 * BLOCK_SIZE, place2->w, place2->h};
     SDL_RenderCopy(renderer, game->label, NULL, &place2Rect);
     SDL_FreeSurface(place2);
     
     sprintf(str, "  %d  \t%5d\t %s", 3, game->highScores[2].value, game->highScores[2].name);
     
-    SDL_Surface *place3 = TTF_RenderText_Blended(game->font, str, white);
+    SDL_Surface *place3 = TTF_RenderText_Blended(game->font, str, orange);
     game->label = SDL_CreateTextureFromSurface(renderer, place3);
-    SDL_Rect place3Rect = {2, 7 * BLOCK_SIZE, place3->w, place3->h};
+    SDL_Rect place3Rect = {(WIDTH*BLOCK_SIZE - place3->w)/2, 7 * BLOCK_SIZE, place3->w, place3->h};
     SDL_RenderCopy(renderer, game->label, NULL, &place3Rect);
     SDL_FreeSurface(place3);
     
     sprintf(str, "  %d  \t%5d\t %s", 4, game->highScores[3].value, game->highScores[3].name);
     
-    SDL_Surface *place4 = TTF_RenderText_Blended(game->font, str, white);
+    SDL_Surface *place4 = TTF_RenderText_Blended(game->font, str, lpink);
     game->label = SDL_CreateTextureFromSurface(renderer, place4);
-    SDL_Rect place4Rect = {2, 8 * BLOCK_SIZE, place4->w, place4->h};
+    SDL_Rect place4Rect = {(WIDTH*BLOCK_SIZE - place4->w)/2, 8 * BLOCK_SIZE, place4->w, place4->h};
     SDL_RenderCopy(renderer, game->label, NULL, &place4Rect);
     SDL_FreeSurface(place4);
     
     sprintf(str, "  %d  \t%5d\t %s", 5, game->highScores[4].value, game->highScores[4].name);
     
-    SDL_Surface *place5 = TTF_RenderText_Blended(game->font, str, white);
+    SDL_Surface *place5 = TTF_RenderText_Blended(game->font, str, lorange);
     game->label = SDL_CreateTextureFromSurface(renderer, place5);
-    SDL_Rect place5Rect = {2, 9 * BLOCK_SIZE, place5->w, place5->h};
+    SDL_Rect place5Rect = {(WIDTH*BLOCK_SIZE - place5->w)/2, 9 * BLOCK_SIZE, place5->w, place5->h};
     SDL_RenderCopy(renderer, game->label, NULL, &place5Rect);
     SDL_FreeSurface(place5);
     
