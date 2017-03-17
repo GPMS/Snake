@@ -210,16 +210,39 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 }
 
 
+SDL_Renderer *drawPlaces(SDL_Renderer *renderer, GameState game, int curPlace)
+{
+	char str[128] = "";
+	SDL_Color colours[5] = {
+		{192, 192, 192, 255},
+		{255,   0,   0, 255},
+		{255, 128,   0, 255},
+		{255, 153, 153, 255},
+		{255, 178, 102, 255}
+	};
+	
+	if (curPlace == 5) {
+		return renderer;
+	}
+    sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game.highScores[curPlace].value, game.highScores[curPlace].name);
+	
+    SDL_Surface *place = TTF_RenderText_Blended(game.font, str, colours[curPlace]);
+    game.label = SDL_CreateTextureFromSurface(renderer, place);
+    SDL_Rect placeRect = {(WIDTH*BLOCK_SIZE - place->w)/2, (5+curPlace) * BLOCK_SIZE, place->w, place->h};
+    SDL_RenderCopy(renderer, game.label, NULL, &placeRect);
+    SDL_FreeSurface(place);
+	
+	curPlace+=1;
+	
+	return drawPlaces(renderer, game, curPlace);
+}
+
+
 SDL_Renderer *drawBoard(GameState *game, Body *head, Body **tail, Apple *apple)
 {
     SDL_Renderer *renderer = game->renderer;
     SDL_Color lblue    =   { 51, 255, 255, 255};
     SDL_Color yellow   =   {255, 255,   0, 255};
-    SDL_Color gray     =   {192, 192, 192, 255};
-    SDL_Color red      =   {255,   0,   0, 255};
-    SDL_Color orange   =   {255, 128,   0, 255};
-    SDL_Color lpink    =   {255, 153, 153, 255};
-    SDL_Color lorange  =   {255, 178, 102, 255};
 
     SDL_SetRenderDrawColor(renderer,
                            0, 0, 0,
@@ -239,46 +262,7 @@ SDL_Renderer *drawBoard(GameState *game, Body *head, Body **tail, Apple *apple)
     SDL_RenderCopy(renderer, game->label, NULL, &textRect);
     SDL_FreeSurface(text);
 
-    char str[128] = "";
-    sprintf(str, "  1  \t%5d\t %s", game->highScores[0].value, game->highScores[0].name);
-
-    SDL_Surface *place1 = TTF_RenderText_Blended(game->font, str, gray);
-    game->label = SDL_CreateTextureFromSurface(renderer, place1);
-    SDL_Rect place1Rect = {(WIDTH*BLOCK_SIZE - place1->w)/2, 5 * BLOCK_SIZE, place1->w, place1->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &place1Rect);
-    SDL_FreeSurface(place1);
-
-    sprintf(str, "  2  \t%5d\t %s", game->highScores[1].value, game->highScores[1].name);
-
-    SDL_Surface *place2 = TTF_RenderText_Blended(game->font, str, red);
-    game->label = SDL_CreateTextureFromSurface(renderer, place2);
-    SDL_Rect place2Rect = {(WIDTH*BLOCK_SIZE - place2->w)/2, 6 * BLOCK_SIZE, place2->w, place2->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &place2Rect);
-    SDL_FreeSurface(place2);
-
-    sprintf(str, "  3  \t%5d\t %s", game->highScores[2].value, game->highScores[2].name);
-
-    SDL_Surface *place3 = TTF_RenderText_Blended(game->font, str, orange);
-    game->label = SDL_CreateTextureFromSurface(renderer, place3);
-    SDL_Rect place3Rect = {(WIDTH*BLOCK_SIZE - place3->w)/2, 7 * BLOCK_SIZE, place3->w, place3->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &place3Rect);
-    SDL_FreeSurface(place3);
-
-    sprintf(str, "  4  \t%5d\t %s", game->highScores[3].value, game->highScores[3].name);
-
-    SDL_Surface *place4 = TTF_RenderText_Blended(game->font, str, lpink);
-    game->label = SDL_CreateTextureFromSurface(renderer, place4);
-    SDL_Rect place4Rect = {(WIDTH*BLOCK_SIZE - place4->w)/2, 8 * BLOCK_SIZE, place4->w, place4->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &place4Rect);
-    SDL_FreeSurface(place4);
-
-    sprintf(str, "  5  \t%5d\t %s", game->highScores[4].value, game->highScores[4].name);
-
-    SDL_Surface *place5 = TTF_RenderText_Blended(game->font, str, lorange);
-    game->label = SDL_CreateTextureFromSurface(renderer, place5);
-    SDL_Rect place5Rect = {(WIDTH*BLOCK_SIZE - place5->w)/2, 9 * BLOCK_SIZE, place5->w, place5->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &place5Rect);
-    SDL_FreeSurface(place5);
+    renderer = drawPlaces(renderer, *game, 0);
 
     renderer = newHighscore(game, head, tail, apple);
 

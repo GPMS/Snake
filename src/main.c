@@ -118,16 +118,21 @@ int main(int argc, char **argv)
 
 void loadHighScore(GameState *game)
 {
-	FILE *fp = fopen("savedata.sav", "rb");
+	FILE *fp = fopen("saveData.bin", "rb");
 	int i;
 	
 	if (fp == NULL) {
+		printf("NO SAVE FILE\n");
 		for (i=0; i < 5; i++) {
 			strcpy(game->highScores[i].name, "???");
 			game->highScores[i].value = 0;
 		}
 	} else {
-		//Next
+		for (i=0; i < 5; i++) {
+			fseek(fp, (sizeof(Score) * i), SEEK_SET);
+			fread(&game->highScores[i], sizeof(Score), 1, fp);
+		}
+		printf("SAVE DATA LOADED\n");
 		fclose(fp);
 	}
 }
@@ -135,9 +140,19 @@ void loadHighScore(GameState *game)
 
 void saveHighScore(GameState game)
 {
-	FILE *fp = fopen("savedata.sav", "wb");
-	fwrite(game.highScores, sizeof(Score) * 5, 5, fp);
-    fclose(fp);
+	FILE *fp = fopen("saveData.bin", "wb");
+	int i;
+	
+	if (fp != NULL) {
+		for(i=0; i < 5; i++) {
+			fseek(fp, 0, SEEK_END);
+			fwrite(&game.highScores[i], sizeof(Score), 5, fp);
+		}
+		printf("SAVED\n");
+    	fclose(fp);
+   	} else {
+   		printf("FILE OPEN ERROR\n");
+   	}
 }
 
 
