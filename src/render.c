@@ -167,6 +167,7 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
             break;
     }
     place[0] = placeNum + '0';
+    place[3] = '\0';
 
     char str[128] = "";
     sprintf(str, "%s place", place);
@@ -194,7 +195,7 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 
     game->pos = placeNum - 1;
 
-    if (game->ok) {
+    if (game->ok == 1) {
 		strcpy(game->highScores[game->pos].name, game->text);
 		ResetGame(game, head, tail, apple);
 		game->state = GAME;
@@ -341,4 +342,9 @@ void doRender(GameState *game, Body *head, Body **tail, Apple *apple)
     }
 
     SDL_RenderPresent(renderer);
+    
+    if (game->ok == 3) {
+    	SDL_Delay(500);
+    	game->ok= 0;
+    }
 }

@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     head->next = NULL;
 
     Apple apple;
-    apple.xGrid = 2;
+    apple.xGrid = 4;
     apple.yGrid = 10;
 
     /* Event loop */
@@ -178,7 +178,7 @@ void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
     head->yGrid = 10;
     head->next = NULL;
 
-    apple->xGrid = 2;
+    apple->xGrid = 4;
     apple->yGrid = 10;
 }
 
