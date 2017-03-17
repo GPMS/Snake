@@ -16,10 +16,11 @@ int done = 0;
 
 int processEvents(GameState *game);
 void moveSnake(GameState game, Body *head);
-unsigned int randr(unsigned int min, unsigned int max);
 void collisionCheck(GameState *game, Body *head, Apple *apple);
 Body *newBody(Body *tail);
 void deleteSnake(Body *head);
+void loadHighScore(GameState *game);
+void saveHighScore(GameState game);
 
 
 int main(int argc, char **argv)
@@ -33,10 +34,7 @@ int main(int argc, char **argv)
     strcpy(game.text, "???");
     game.l = 0;
 
-    for (int i=0; i < 5; i++) {
-    	strcpy(game.highScores[i].name, "???");
-	    game.highScores[i].value = 0;
-    }
+    loadHighScore(&game);
 
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -109,10 +107,37 @@ int main(int argc, char **argv)
 
     SDL_DestroyWindow(game.window);
     SDL_DestroyRenderer(game.renderer);
+    
+    saveHighScore(game);
 
     SDL_Quit();
 
     return 0;
+}
+
+
+void loadHighScore(GameState *game)
+{
+	FILE *fp = fopen("savedata.sav", "rb");
+	int i;
+	
+	if (fp == NULL) {
+		for (i=0; i < 5; i++) {
+			strcpy(game->highScores[i].name, "???");
+			game->highScores[i].value = 0;
+		}
+	} else {
+		//Next
+		fclose(fp);
+	}
+}
+
+
+void saveHighScore(GameState game)
+{
+	FILE *fp = fopen("savedata.sav", "wb");
+	fwrite(game.highScores, sizeof(Score) * 5, 5, fp);
+    fclose(fp);
 }
 
 
