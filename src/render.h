@@ -2,7 +2,6 @@
 #define RENDER_H
 
 
-void doRender(GameState *game, Body *head, Apple apple);
-
+void doRender(GameState *game, Body *head, Body **tail, Apple *apple);
 
 #endif

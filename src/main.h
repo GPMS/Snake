@@ -29,23 +29,33 @@ typedef struct{
 typedef struct{
     SDL_bool running;
     int state;
-	
+    int ok;
+
 	SDL_Window *window;
     SDL_Renderer *renderer;
-    
+
     /* Player */
+    int pos;
     int direction;
     int parts;
     int partsDrawn;
     int score;
     int asw;
+    int gameOver;
     Score highScores[5];
-    
+
     SDL_Texture *label;
     TTF_Font *font;
+
+    char text[4];
+	char *composition;
+	Sint32 cursor;
+	Sint32 selection_len;
+	int l;
 
 } GameState;
 
 int processEvents(GameState *game);
+void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple);
 
 #endif
