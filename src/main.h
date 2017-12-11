@@ -11,27 +11,27 @@
 enum dir { NORTH, EAST, WEST, SOUTH };
 enum state { GAME, PAUSE, GAMEOVER, PROMPT, SAVE, BOARD };
 
-typedef struct Body{
+typedef struct Body {
     int pastXGrid, pastYGrid;
     int xGrid, yGrid;
     struct Body *next;
 } Body;
 
-typedef struct{
+typedef struct {
     int xGrid, yGrid;
 } Apple;
 
-typedef struct{
-	char name[4];
-	int value;
+typedef struct {
+    char name[4];
+    int value;
 } Score;
 
-typedef struct{
+typedef struct {
     SDL_bool running;
     int state;
     int ok;
 
-	SDL_Window *window;
+    SDL_Window *window;
     SDL_Renderer *renderer;
 
     /* Player */
@@ -48,14 +48,16 @@ typedef struct{
     TTF_Font *font;
 
     char text[4];
-	char *composition;
-	Sint32 cursor;
-	Sint32 selection_len;
-	int l;
+    char *composition;
+    Sint32 cursor;
+    Sint32 selection_len;
+    int l;
 
 } GameState;
 
 int processEvents(GameState *game);
+
+#endif
 void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple);
 
 #endif

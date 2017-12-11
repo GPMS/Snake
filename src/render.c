@@ -196,15 +196,15 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
     game->pos = placeNum - 1;
 
     if (game->ok == 1) {
-		strcpy(game->highScores[game->pos].name, game->text);
-		ResetGame(game, head, tail, apple);
-		game->state = GAME;
+        strcpy(game->highScores[game->pos].name, game->text);
+        ResetGame(game, head, tail, apple);
+        game->state = GAME;
     } else if (game->ok == 3) {
-		SDL_Surface *warn = TTF_RenderText_Blended(game->font, "AT LEAST 3 CHARACTERS", white);
-		game->label = SDL_CreateTextureFromSurface(renderer, warn);
-		SDL_Rect warnRect = {(WIDTH*BLOCK_SIZE - warn->w)/2, 19 * BLOCK_SIZE, warn->w, warn->h};
-		SDL_RenderCopy(renderer, game->label, NULL, &warnRect);
-		SDL_FreeSurface(warn);
+        SDL_Surface *warn = TTF_RenderText_Blended(game->font, "AT LEAST 3 CHARACTERS", white);
+        game->label = SDL_CreateTextureFromSurface(renderer, warn);
+        SDL_Rect warnRect = {(WIDTH*BLOCK_SIZE - warn->w)/2, 19 * BLOCK_SIZE, warn->w, warn->h};
+        SDL_RenderCopy(renderer, game->label, NULL, &warnRect);
+        SDL_FreeSurface(warn);
     }
 
     return renderer;
@@ -213,29 +213,29 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 
 SDL_Renderer *drawPlaces(SDL_Renderer *renderer, GameState game, int curPlace)
 {
-	char str[128] = "";
-	SDL_Color colours[5] = {
-		{192, 192, 192, 255},
-		{255,   0,   0, 255},
-		{255, 128,   0, 255},
-		{255, 153, 153, 255},
-		{255, 178, 102, 255}
-	};
-	
-	if (curPlace == 5) {
-		return renderer;
-	}
+    char str[128] = "";
+    SDL_Color colours[5] = {
+        {192, 192, 192, 255},
+        {255,   0,   0, 255},
+        {255, 128,   0, 255},
+        {255, 153, 153, 255},
+        {255, 178, 102, 255}
+    };
+    
+    if (curPlace == 5) {
+        return renderer;
+    }
     sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game.highScores[curPlace].value, game.highScores[curPlace].name);
-	
+    
     SDL_Surface *place = TTF_RenderText_Blended(game.font, str, colours[curPlace]);
     game.label = SDL_CreateTextureFromSurface(renderer, place);
     SDL_Rect placeRect = {(WIDTH*BLOCK_SIZE - place->w)/2, (5+curPlace) * BLOCK_SIZE, place->w, place->h};
     SDL_RenderCopy(renderer, game.label, NULL, &placeRect);
     SDL_FreeSurface(place);
-	
-	curPlace+=1;
-	
-	return drawPlaces(renderer, game, curPlace);
+    
+    curPlace+=1;
+    
+    return drawPlaces(renderer, game, curPlace);
 }
 
 
@@ -301,22 +301,22 @@ SDL_Renderer *drawGameOver(GameState *game)
     SDL_FreeSurface(pts);
 
     /* Continue? */
-	game->gameOver = 1;
+    game->gameOver = 1;
     SDL_Surface *prmt = TTF_RenderText_Blended(game->font, "CONTINUE? (Y/N)", white);
-	game->label = SDL_CreateTextureFromSurface(renderer, prmt);
-	SDL_Rect prmtRect = {(WIDTH*BLOCK_SIZE - prmt->w)/2, 20 * BLOCK_SIZE, prmt->w, prmt->h};
-	SDL_RenderCopy(renderer, game->label, NULL, &prmtRect);
-	SDL_FreeSurface(prmt);
+    game->label = SDL_CreateTextureFromSurface(renderer, prmt);
+    SDL_Rect prmtRect = {(WIDTH*BLOCK_SIZE - prmt->w)/2, 20 * BLOCK_SIZE, prmt->w, prmt->h};
+    SDL_RenderCopy(renderer, game->label, NULL, &prmtRect);
+    SDL_FreeSurface(prmt);
 
-	switch(game->asw) {
-		case 0:
-			game->running = SDL_FALSE;
-			break;
-		case 1:
-			game->gameOver = 0;
-			game->state = GAME;
-			break;
-	}
+    switch(game->asw) {
+        case 0:
+            game->running = SDL_FALSE;
+            break;
+        case 1:
+            game->gameOver = 0;
+            game->state = GAME;
+            break;
+    }
 
     return renderer;
 }
@@ -337,14 +337,14 @@ void doRender(GameState *game, Body *head, Body **tail, Apple *apple)
             renderer = drawGameOver(game);
             break;
         case BOARD:
-        	renderer = drawBoard(game, head, tail, apple);
+            renderer = drawBoard(game, head, tail, apple);
             break;
     }
 
     SDL_RenderPresent(renderer);
     
     if (game->ok == 3) {
-    	SDL_Delay(500);
-    	game->ok= 0;
+        SDL_Delay(500);
+        game->ok= 0;
     }
 }

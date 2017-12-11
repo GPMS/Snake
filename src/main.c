@@ -30,7 +30,7 @@ int main(int argc, char **argv)
     game.gameOver = 0;
     game.asw = 3;
     game.ok = 0;
-
+    
     strcpy(game.text, "???");
     game.l = 0;
 
@@ -118,47 +118,47 @@ int main(int argc, char **argv)
 
 void loadHighScore(GameState *game)
 {
-	FILE *fp = fopen("saveData.bin", "rb");
-	int i;
-	
-	if (fp == NULL) {
-		printf("NO SAVE FILE\n");
-		for (i=0; i < 5; i++) {
-			strcpy(game->highScores[i].name, "???");
-			game->highScores[i].value = 0;
-		}
-	} else {
-		for (i=0; i < 5; i++) {
-			fseek(fp, (sizeof(Score) * i), SEEK_SET);
-			fread(&game->highScores[i], sizeof(Score), 1, fp);
-		}
-		printf("SAVE DATA LOADED\n");
-		fclose(fp);
-	}
+    FILE *fp = fopen("saveData.bin", "rb");
+    int i;
+    
+    if (fp == NULL) {
+        printf("NO SAVE FILE\n");
+        for (i=0; i < 5; i++) {
+            strcpy(game->highScores[i].name, "???");
+            game->highScores[i].value = 0;
+        }
+    } else {
+        for (i=0; i < 5; i++) {
+            fseek(fp, (sizeof(Score) * i), SEEK_SET);
+            fread(&game->highScores[i], sizeof(Score), 1, fp);
+        }
+        printf("SAVE DATA LOADED\n");
+        fclose(fp);
+    }
 }
 
 
 void saveHighScore(GameState game)
 {
-	FILE *fp = fopen("saveData.bin", "wb");
-	int i;
-	
-	if (fp != NULL) {
-		for(i=0; i < 5; i++) {
-			fseek(fp, 0, SEEK_END);
-			fwrite(&game.highScores[i], sizeof(Score), 5, fp);
-		}
-		printf("SAVED\n");
-    	fclose(fp);
-   	} else {
-   		printf("FILE OPEN ERROR\n");
-   	}
+    FILE *fp = fopen("saveData.bin", "wb");
+    int i;
+    
+    if (fp != NULL) {
+        for(i=0; i < 5; i++) {
+            fseek(fp, 0, SEEK_END);
+            fwrite(&game.highScores[i], sizeof(Score), 5, fp);
+        }
+        printf("SAVED\n");
+        fclose(fp);
+    } else {
+        printf("FILE OPEN ERROR\n");
+    }
 }
 
 
 void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
 {
-	game->gameOver = 0;
+    game->gameOver = 0;
     game->asw = 3;
     game->ok = 0;
 
@@ -166,9 +166,9 @@ void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
     game->l = 0;
 
     deleteSnake(head->next);
-	
-	*tail = head;
-	
+    
+    *tail = head;
+    
     game->direction = EAST;
     game->parts = INITIAL_SIZE;
     game->partsDrawn = 1;
@@ -241,39 +241,39 @@ int processEvents(GameState *game)
                             game->asw = 0;
                         break;
                     case SDLK_BACKSPACE:
-                    	if (game->l > 0 && game->state == BOARD) {
-                    		game->text[--game->l] = '?';
-                    	}
-                    	break;
+                        if (game->l > 0 && game->state == BOARD) {
+                            game->text[--game->l] = '?';
+                        }
+                        break;
                     case SDLK_RETURN:
-                    	if (game->state == BOARD) {
-		                	if (game->l < 3)
-		                		game->ok = 3;
-		                	else
-		                		game->ok = 1;
-                    	}
+                        if (game->state == BOARD) {
+                            if (game->l < 3)
+                                game->ok = 3;
+                            else
+                                game->ok = 1;
+                        }
                 }
                 break;
             case SDL_TEXTINPUT:
-				if (game->state == BOARD) {
-					/* Add new text onto the end of our text */
-					if (game->l < 3) {
-						game->text[game->l++] = event.edit.text[0];
-					}
-				}
-				break;
-			case SDL_TEXTEDITING:
-				if (game->state == BOARD) {
-					/*
-					Update the composition text.
-					Update the cursor position.
-					Update the selection length (if any).
-					*/
-					game->composition = event.edit.text;
-					game->cursor = event.edit.start;
-					game->selection_len = event.edit.length;
-				}
-				break;
+                if (game->state == BOARD) {
+                    /* Add new text onto the end of our text */
+                    if (game->l < 3) {
+                        game->text[game->l++] = event.edit.text[0];
+                    }
+                }
+                break;
+            case SDL_TEXTEDITING:
+                if (game->state == BOARD) {
+                    /*
+                    Update the composition text.
+                    Update the cursor position.
+                    Update the selection length (if any).
+                    */
+                    game->composition = event.edit.text;
+                    game->cursor = event.edit.start;
+                    game->selection_len = event.edit.length;
+                }
+                break;
             case SDL_QUIT:
                 game->running = SDL_FALSE;
                 break;
@@ -328,27 +328,27 @@ void moveSnake(GameState game, Body *head)
 void shiftPlace(GameState *game, int place)
 {
 
-	int i;
-	int side = 0;
+    int i;
+    int side = 0;
 
-	char holdN[2][4] = {"",""};
-	int holdV[2] 	 = { 0, 0};
+    char holdN[2][4] = {"",""};
+    int holdV[2]     = { 0, 0};
 
-	for (i = place; i < 4; i++) {
+    for (i = place; i < 4; i++) {
 
-		holdV[side] = game->highScores[i+1].value;
-		strcpy(holdN[side], game->highScores[i+1].name);
+        holdV[side] = game->highScores[i+1].value;
+        strcpy(holdN[side], game->highScores[i+1].name);
 
-		if (i == place) {
-			game->highScores[i+1].value = game->highScores[i].value;
-			strcpy(game->highScores[i+1].name, game->highScores[i].name);
-		} else {
-			game->highScores[i+1].value = holdV[!side];
-			strcpy(game->highScores[i+1].name, holdN[!side]);
-		}
+        if (i == place) {
+            game->highScores[i+1].value = game->highScores[i].value;
+            strcpy(game->highScores[i+1].name, game->highScores[i].name);
+        } else {
+            game->highScores[i+1].value = holdV[!side];
+            strcpy(game->highScores[i+1].name, holdN[!side]);
+        }
 
-		side ^= 1;
-	}
+        side ^= 1;
+    }
 }
 
 
@@ -403,35 +403,35 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
         if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) ) {
 
             if (game->score >= game->highScores[4].value) {
-				for (i = 4; i > -1; i--) {
-					if (game->score < game->highScores[i].value) {
-						shiftPlace(game, i+1);
+                for (i = 4; i > -1; i--) {
+                    if (game->score < game->highScores[i].value) {
+                        shiftPlace(game, i+1);
 
-						strcpy( game->highScores[i+1].name, "---");
-						game->highScores[i+1].value = game->score;
-						break;
-					} else if (game->score == game->highScores[i].value) {
-						shiftPlace(game, i);
+                        strcpy( game->highScores[i+1].name, "---");
+                        game->highScores[i+1].value = game->score;
+                        break;
+                    } else if (game->score == game->highScores[i].value) {
+                        shiftPlace(game, i);
 
-						strcpy( game->highScores[i].name, "---");
-						game->highScores[i].value = game->score;
-						break;
-					} else if (i == 0) {
-						shiftPlace(game, 0);
+                        strcpy( game->highScores[i].name, "---");
+                        game->highScores[i].value = game->score;
+                        break;
+                    } else if (i == 0) {
+                        shiftPlace(game, 0);
 
-						strcpy( game->highScores[0].name, "---");
-						game->highScores[0].value = game->score;
-					}
-				}
-            	game->state = BOARD;
+                        strcpy( game->highScores[0].name, "---");
+                        game->highScores[0].value = game->score;
+                    }
+                }
+                game->state = BOARD;
 
             } else
-            	game->state = GAMEOVER;
+                game->state = GAMEOVER;
             break;
         }
         current = current->next;
     }
-
+    
     /* Outside boundary */
 
     // up
