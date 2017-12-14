@@ -211,9 +211,11 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 }
 
 
-SDL_Renderer *drawPlaces(SDL_Renderer *renderer, GameState game, int curPlace)
+SDL_Renderer *drawPlaces(GameState *game, int curPlace)
 {
+	SDL_Renderer *renderer = game->renderer;
     char str[128] = "";
+	
     SDL_Color colours[5] = {
         {192, 192, 192, 255},
         {255,   0,   0, 255},
@@ -225,17 +227,17 @@ SDL_Renderer *drawPlaces(SDL_Renderer *renderer, GameState game, int curPlace)
     if (curPlace == 5) {
         return renderer;
     }
-    sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game.highScores[curPlace].value, game.highScores[curPlace].name);
+    sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game->highScores[curPlace].value, game->highScores[curPlace].name);
     
-    SDL_Surface *place = TTF_RenderText_Blended(game.font, str, colours[curPlace]);
-    game.label = SDL_CreateTextureFromSurface(renderer, place);
+    SDL_Surface *place = TTF_RenderText_Blended(game->font, str, colours[curPlace]);
+    game->label = SDL_CreateTextureFromSurface(renderer, place);
     SDL_Rect placeRect = {(WIDTH*BLOCK_SIZE - place->w)/2, (5+curPlace) * BLOCK_SIZE, place->w, place->h};
-    SDL_RenderCopy(renderer, game.label, NULL, &placeRect);
+    SDL_RenderCopy(renderer, game->label, NULL, &placeRect);
     SDL_FreeSurface(place);
     
     curPlace+=1;
     
-    return drawPlaces(renderer, game, curPlace);
+    return drawPlaces(game, curPlace);
 }
 
 
@@ -263,7 +265,7 @@ SDL_Renderer *drawBoard(GameState *game, Body *head, Body **tail, Apple *apple)
     SDL_RenderCopy(renderer, game->label, NULL, &textRect);
     SDL_FreeSurface(text);
 
-    renderer = drawPlaces(renderer, *game, 0);
+    renderer = drawPlaces(game, 0);
 
     renderer = newHighscore(game, head, tail, apple);
 
