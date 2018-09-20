@@ -4,12 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-
-/* main Header file */
+// Local files
 #include "main.h"
-/* sub Headers */
 #include "render.h"
 
 int done = 0;
@@ -30,7 +26,7 @@ int main(int argc, char **argv)
     game.gameOver = 0;
     game.asw = 3;
     game.ok = 0;
-    
+
     strcpy(game.text, "???");
     game.l = 0;
 
@@ -40,12 +36,13 @@ int main(int argc, char **argv)
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 
-    game.window = SDL_CreateWindow(GNAME,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              SDL_WINDOWPOS_UNDEFINED,
-                              WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE,
-                              0
-                             );
+    game.window = SDL_CreateWindow(
+        GNAME,
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE,
+        0
+    );
     game.renderer = SDL_CreateRenderer(game.window, -1, SDL_RENDERER_ACCELERATED);
 
     game.running = SDL_TRUE;
@@ -56,7 +53,7 @@ int main(int argc, char **argv)
     head = malloc(sizeof(Body));
     tail = head;
 
-    srandom((int)time(NULL));
+    srand((int)time(NULL));
 
     game.pos = 0;
     game.direction = EAST;
@@ -66,7 +63,8 @@ int main(int argc, char **argv)
 
     game.font = NULL;
     game.font = TTF_OpenFont("font/emulogic.ttf", 24);
-    if (game.font == NULL) {
+    if (game.font == NULL)
+    {
         printf("COULD NOT FIND FONT FILE!\n");
         SDL_Quit();
         return 1;
@@ -81,11 +79,14 @@ int main(int argc, char **argv)
     apple.yGrid = 10;
 
     /* Event loop */
-    while (game.running) {
+    while (game.running)
+    {
         processEvents(&game);
 
-        if (game.state == GAME) {
-            while (game.partsDrawn < game.parts) {
+        if (game.state == GAME)
+        {
+            while (game.partsDrawn < game.parts)
+            {
                 tail = newBody(tail);
                 game.partsDrawn++;
             }
@@ -107,7 +108,7 @@ int main(int argc, char **argv)
 
     SDL_DestroyWindow(game.window);
     SDL_DestroyRenderer(game.renderer);
-    
+
     saveHighScore(game);
 
     SDL_Quit();
@@ -120,15 +121,20 @@ void loadHighScore(GameState *game)
 {
     FILE *fp = fopen("saveData.bin", "rb");
     int i;
-    
-    if (fp == NULL) {
+
+    if (fp == NULL)
+    {
         printf("NO SAVE FILE\n");
-        for (i=0; i < 5; i++) {
+        for (i=0; i < 5; i++)
+        {
             strcpy(game->highScores[i].name, "???");
             game->highScores[i].value = 0;
         }
-    } else {
-        for (i=0; i < 5; i++) {
+    }
+    else
+    {
+        for (i=0; i < 5; i++)
+        {
             fseek(fp, (sizeof(Score) * i), SEEK_SET);
             fread(&game->highScores[i], sizeof(Score), 1, fp);
         }
@@ -142,15 +148,19 @@ void saveHighScore(GameState game)
 {
     FILE *fp = fopen("saveData.bin", "wb");
     int i;
-    
-    if (fp != NULL) {
-        for(i=0; i < 5; i++) {
+
+    if (fp != NULL)
+    {
+        for(i=0; i < 5; i++)
+        {
             fseek(fp, 0, SEEK_END);
             fwrite(&game.highScores[i], sizeof(Score), 5, fp);
         }
         printf("SAVED\n");
         fclose(fp);
-    } else {
+    }
+    else
+    {
         printf("FILE OPEN ERROR\n");
     }
 }
@@ -166,9 +176,9 @@ void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
     game->l = 0;
 
     deleteSnake(head->next);
-    
+
     *tail = head;
-    
+
     game->direction = EAST;
     game->parts = INITIAL_SIZE;
     game->partsDrawn = 1;
@@ -187,17 +197,21 @@ int processEvents(GameState *game)
 {
     SDL_Event event;
 
-    while (SDL_PollEvent(&event)) {
-        switch (event.type) {
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
             case SDL_WINDOWEVENT_CLOSE:
-                if (game->window) {
+                if (game->window)
+                {
                     SDL_DestroyWindow(game->window);
                     game->window = NULL;
                     game->running = SDL_FALSE;
                 }
                 break;
             case SDL_KEYDOWN:
-                switch(event.key.keysym.sym) {
+                switch(event.key.keysym.sym)
+                {
                     case SDLK_ESCAPE:
                         game->running = SDL_FALSE;
                         break;
@@ -206,28 +220,31 @@ int processEvents(GameState *game)
                             game->state = PAUSE;
                         else if (game->state == PAUSE)
                             game->state = GAME;
-
                         break;
                     case SDLK_UP:
-                        if ((game->parts == 1 || game->direction != SOUTH) && done == 0) {
+                        if ((game->parts == 1 || game->direction != SOUTH) && done == 0)
+                        {
                             game->direction = NORTH;
                             done = 1;
                         }
                         break;
                     case SDLK_DOWN:
-                        if ((game->parts == 1 || game->direction != NORTH) && done == 0) {
+                        if ((game->parts == 1 || game->direction != NORTH) && done == 0)
+                        {
                             game->direction = SOUTH;
                             done = 1;
                         }
                         break;
                     case SDLK_RIGHT:
-                        if ((game->parts == 1 || game->direction != WEST) && done ==  0){
+                        if ((game->parts == 1 || game->direction != WEST) && done ==  0)
+                        {
                             game->direction = EAST;
                             done = 1;
                         }
                         break;
                     case SDLK_LEFT:
-                        if ((game->parts == 1 || game->direction != EAST) && done == 0) {
+                        if ((game->parts == 1 || game->direction != EAST) && done == 0)
+                        {
                             game->direction = WEST;
                             done = 1;
                         }
@@ -241,12 +258,12 @@ int processEvents(GameState *game)
                             game->asw = 0;
                         break;
                     case SDLK_BACKSPACE:
-                        if (game->l > 0 && game->state == BOARD) {
+                        if (game->l > 0 && game->state == BOARD)
                             game->text[--game->l] = '?';
-                        }
                         break;
                     case SDLK_RETURN:
-                        if (game->state == BOARD) {
+                        if (game->state == BOARD)
+                        {
                             if (game->l < 3)
                                 game->ok = 3;
                             else
@@ -255,20 +272,19 @@ int processEvents(GameState *game)
                 }
                 break;
             case SDL_TEXTINPUT:
-                if (game->state == BOARD) {
-                    /* Add new text onto the end of our text */
-                    if (game->l < 3) {
+                if (game->state == BOARD)
+                {
+                    // Add new text onto the end of our text
+                    if (game->l < 3)
                         game->text[game->l++] = event.edit.text[0];
-                    }
                 }
                 break;
             case SDL_TEXTEDITING:
-                if (game->state == BOARD) {
-                    /*
-                    Update the composition text.
-                    Update the cursor position.
-                    Update the selection length (if any).
-                    */
+                if (game->state == BOARD)
+                {
+                    // Update the composition text.
+                    // Update the cursor position.
+                    // Update the selection length (if any).
                     game->composition = event.edit.text;
                     game->cursor = event.edit.start;
                     game->selection_len = event.edit.length;
@@ -285,8 +301,9 @@ int processEvents(GameState *game)
 
 void moveSnake(GameState game, Body *head)
 {
-    /* Move Head */
-    switch(game.direction) {
+    // Move head
+    switch(game.direction)
+    {
         case NORTH:
             head->pastYGrid = head->yGrid;
             head->pastXGrid = head->xGrid;
@@ -313,7 +330,8 @@ void moveSnake(GameState game, Body *head)
     Body *current = head->next;
     Body *previous = head;
 
-    while (current != NULL) {
+    while (current != NULL)
+    {
         current->pastXGrid = current->xGrid;
         current->xGrid = previous->pastXGrid;
         current->pastYGrid = current->yGrid;
@@ -331,18 +349,23 @@ void shiftPlace(GameState *game, int place)
     int i;
     int side = 0;
 
-    char holdN[2][4] = {"",""};
-    int holdV[2]     = { 0, 0};
+    // Hold on to name and score
+    char holdN[2][4] = {"",""}; // name
+    int holdV[2]     = { 0, 0}; // score
 
-    for (i = place; i < 4; i++) {
+    for (i = place; i < 4; i++)
+    {
 
         holdV[side] = game->highScores[i+1].value;
         strcpy(holdN[side], game->highScores[i+1].name);
 
-        if (i == place) {
+        if (i == place)
+        {
             game->highScores[i+1].value = game->highScores[i].value;
             strcpy(game->highScores[i+1].name, game->highScores[i].name);
-        } else {
+        }
+        else
+        {
             game->highScores[i+1].value = holdV[!side];
             strcpy(game->highScores[i+1].name, holdN[!side]);
         }
@@ -354,20 +377,21 @@ void shiftPlace(GameState *game, int place)
 
 unsigned int randr(unsigned int min, unsigned int max)
 {
-       double scaled = (double)rand()/RAND_MAX;
+    double scaled = (double)rand()/RAND_MAX;
 
-       return (max - min +1)*scaled + min;
+    return (max - min +1)*scaled + min;
 }
 
 void collisionCheck(GameState *game, Body *head, Apple *apple)
 {
-    /* Apple collision */
-    if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) ) {
-
+    // Apple collision
+    if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) )
+    {
         if (game->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
             game->score += 10;
 
-        while (1) {
+        while (1)
+        {
             // Change apple location
             apple->xGrid = randr(2, WIDTH-3);
             apple->yGrid = randr(3, HEIGHT-2);
@@ -379,8 +403,10 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
 
             Body *current = head;
 
-            while(current != NULL) {
-                if ( (apple->xGrid == current->xGrid) && (apple->yGrid == current->yGrid) ) {
+            while(current != NULL)
+            {
+                if ( (apple->xGrid == current->xGrid) && (apple->yGrid == current->yGrid) )
+                {
                     ok = 0;
                     break;
                 }
@@ -391,32 +417,42 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
             if (ok) break;
         }
 
-        game->parts++;  // Add body parts
+        // Add body parts
+        game->parts++;
     }
 
-    /* Body collision */
+    // Body collision
     Body *current = head->next;
 
     int i;
 
-    while (current != NULL) {
-        if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) ) {
+    while (current != NULL)
+    {
+        if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) )
+        {
 
-            if (game->score >= game->highScores[4].value) {
-                for (i = 4; i > -1; i--) {
-                    if (game->score < game->highScores[i].value) {
+            if (game->score >= game->highScores[4].value)
+            {
+                for (i = 4; i > -1; i--)
+                {
+                    if (game->score < game->highScores[i].value)
+                    {
                         shiftPlace(game, i+1);
 
                         strcpy( game->highScores[i+1].name, "---");
                         game->highScores[i+1].value = game->score;
                         break;
-                    } else if (game->score == game->highScores[i].value) {
+                    }
+                    else if (game->score == game->highScores[i].value)
+                    {
                         shiftPlace(game, i);
 
                         strcpy( game->highScores[i].name, "---");
                         game->highScores[i].value = game->score;
                         break;
-                    } else if (i == 0) {
+                    }
+                    else if (i == 0)
+                    {
                         shiftPlace(game, 0);
 
                         strcpy( game->highScores[0].name, "---");
@@ -425,30 +461,39 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
                 }
                 game->state = BOARD;
 
-            } else
+            }
+            else
+            {
                 game->state = GAMEOVER;
-            break;
+                break;
+            }
         }
         current = current->next;
     }
-    
-    /* Outside boundary */
+
+    // Outside boundary
 
     // up
-    if (head->yGrid < 3) {
+    if (head->yGrid < 3)
+    {
         head->pastYGrid = head->yGrid;
         head->yGrid = HEIGHT-2;
+    }
     // down
-    } else if (head->yGrid > HEIGHT-2) {
+    else if (head->yGrid > HEIGHT-2)
+    {
         head->pastYGrid = head->yGrid;
         head->yGrid = 3;
     }
     // right
-    if (head->xGrid > WIDTH-3) {
+    if (head->xGrid > WIDTH-3)
+    {
         head->pastXGrid = head->xGrid;
         head->xGrid = 2;
+    }
     // left
-    } else if (head->xGrid < 2) {
+    else if (head->xGrid < 2)
+    {
         head->pastXGrid = head->xGrid;
         head->xGrid = WIDTH-3;
     }
@@ -467,13 +512,13 @@ Body *newBody(Body *tail)
     return newBody;
 }
 
-
 void deleteSnake(Body *head)
 {
     Body *freeMe = head;
     Body *holdMe = NULL;
 
-    while(freeMe != NULL) {
+    while(freeMe != NULL)
+    {
         holdMe = freeMe->next;
         free(freeMe);
         freeMe = holdMe;

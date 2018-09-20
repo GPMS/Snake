@@ -1,6 +1,9 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
 #define WIDTH           26  // BLOCK_SIZEs
 #define HEIGHT          26  // BLOCK_SIZEs
 #define GNAME            "Snake"
@@ -52,12 +55,9 @@ typedef struct {
     Sint32 cursor;
     Sint32 selection_len;
     int l;
-
 } GameState;
 
 int processEvents(GameState *game);
-
-#endif
 void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple);
 
 #endif
