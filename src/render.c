@@ -276,6 +276,7 @@ SDL_Renderer *drawGameOverScreen(GameState *game)
             break;
         case 1:
             game->gameOver = 0;
+            ResetGame(game);
             game->state = GAME;
             break;
     }
