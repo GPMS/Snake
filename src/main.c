@@ -11,12 +11,13 @@
 int done = 0;
 
 int processEvents(GameState *game);
-void moveSnake(GameState game, Body *head);
-void collisionCheck(GameState *game, Body *head, Apple *apple);
+void moveSnake(GameState *game);
+void collisionCheck(GameState *game);
 Body *newBody(Body *tail);
+void InitPlayer(Player *player);
 void deleteSnake(Body *head);
 void loadHighScore(GameState *game);
-void saveHighScore(GameState game);
+void saveHighScore(const GameState *game);
 
 
 int main(int argc, char **argv)
@@ -47,19 +48,12 @@ int main(int argc, char **argv)
 
     game.running = SDL_TRUE;
 
-    Body *head = NULL;
-    Body *tail = NULL;
+    InitPlayer(&game.player);
 
-    head = malloc(sizeof(Body));
-    tail = head;
+    game.apple.xGrid = 4;
+    game.apple.yGrid = 10;
 
     srand((int)time(NULL));
-
-    game.pos = 0;
-    game.direction = EAST;
-    game.parts = INITIAL_SIZE;
-    game.partsDrawn = 1;
-    game.score = 0;
 
     game.font = NULL;
     game.font = TTF_OpenFont("font/emulogic.ttf", 24);
@@ -70,14 +64,6 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    head->xGrid = 5;
-    head->yGrid = 10;
-    head->next = NULL;
-
-    Apple apple;
-    apple.xGrid = 4;
-    apple.yGrid = 10;
-
     /* Event loop */
     while (game.running)
     {
@@ -85,31 +71,30 @@ int main(int argc, char **argv)
 
         if (game.state == GAME)
         {
-            while (game.partsDrawn < game.parts)
+            while (game.player.partsDrawn < game.player.parts)
             {
-                tail = newBody(tail);
-                game.partsDrawn++;
+                game.player.tail = newBody(game.player.tail);
+                game.player.partsDrawn++;
             }
 
-            moveSnake(game, head);
-            collisionCheck(&game, head, &apple);
+            moveSnake(&game);
+            collisionCheck(&game);
         }
 
-        doRender(&game, head, &tail, &apple);
+        doRender(&game);
         SDL_Delay(100);
 
         done = 0;
     }
 
-    deleteSnake(head);
+    deleteSnake(game.player.head);
 
-    SDL_DestroyTexture(game.label);
     TTF_CloseFont(game.font);
 
     SDL_DestroyWindow(game.window);
     SDL_DestroyRenderer(game.renderer);
 
-    saveHighScore(game);
+    saveHighScore(&game);
 
     SDL_Quit();
 
@@ -144,7 +129,7 @@ void loadHighScore(GameState *game)
 }
 
 
-void saveHighScore(GameState game)
+void saveHighScore(const GameState *game)
 {
     FILE *fp = fopen("saveData.bin", "wb");
     int i;
@@ -154,7 +139,7 @@ void saveHighScore(GameState game)
         for(i=0; i < 5; i++)
         {
             fseek(fp, 0, SEEK_END);
-            fwrite(&game.highScores[i], sizeof(Score), 5, fp);
+            fwrite(&game->highScores[i], sizeof(Score), 5, fp);
         }
         printf("SAVED\n");
         fclose(fp);
@@ -165,8 +150,26 @@ void saveHighScore(GameState game)
     }
 }
 
+void InitPlayer(Player *player)
+{
+    player->head = NULL;
+    player->tail = NULL;
 
-void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
+    player->head = malloc(sizeof(Body));
+    player->tail = player->head;
+
+    player->pos = 0;
+    player->direction = EAST;
+    player->parts = INITIAL_SIZE;
+    player->partsDrawn = 1;
+    player->score = 0;
+
+    player->head->xGrid = 5;
+    player->head->yGrid = 10;
+    player->head->next = NULL;
+}
+
+void ResetGame(GameState *game)
 {
     game->gameOver = 0;
     game->asw = 3;
@@ -175,21 +178,12 @@ void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple)
     strcpy(game->text, "???");
     game->l = 0;
 
-    deleteSnake(head->next);
+    deleteSnake(game->player.head);
 
-    *tail = head;
+    InitPlayer(&game->player);
 
-    game->direction = EAST;
-    game->parts = INITIAL_SIZE;
-    game->partsDrawn = 1;
-    game->score = 0;
-
-    head->xGrid = 5;
-    head->yGrid = 10;
-    head->next = NULL;
-
-    apple->xGrid = 4;
-    apple->yGrid = 10;
+    game->apple.xGrid = 4;
+    game->apple.yGrid = 10;
 }
 
 
@@ -222,30 +216,30 @@ int processEvents(GameState *game)
                             game->state = GAME;
                         break;
                     case SDLK_UP:
-                        if ((game->parts == 1 || game->direction != SOUTH) && done == 0)
+                        if ((game->player.parts == 1 || game->player.direction != SOUTH) && done == 0)
                         {
-                            game->direction = NORTH;
+                            game->player.direction = NORTH;
                             done = 1;
                         }
                         break;
                     case SDLK_DOWN:
-                        if ((game->parts == 1 || game->direction != NORTH) && done == 0)
+                        if ((game->player.parts == 1 || game->player.direction != NORTH) && done == 0)
                         {
-                            game->direction = SOUTH;
+                            game->player.direction = SOUTH;
                             done = 1;
                         }
                         break;
                     case SDLK_RIGHT:
-                        if ((game->parts == 1 || game->direction != WEST) && done ==  0)
+                        if ((game->player.parts == 1 || game->player.direction != WEST) && done ==  0)
                         {
-                            game->direction = EAST;
+                            game->player.direction = EAST;
                             done = 1;
                         }
                         break;
                     case SDLK_LEFT:
-                        if ((game->parts == 1 || game->direction != EAST) && done == 0)
+                        if ((game->player.parts == 1 || game->player.direction != EAST) && done == 0)
                         {
-                            game->direction = WEST;
+                            game->player.direction = WEST;
                             done = 1;
                         }
                         break;
@@ -299,36 +293,38 @@ int processEvents(GameState *game)
 }
 
 
-void moveSnake(GameState game, Body *head)
+void moveSnake(GameState *game)
 {
+    Player *player = &game->player;
+
     // Move head
-    switch(game.direction)
+    switch(player->direction)
     {
         case NORTH:
-            head->pastYGrid = head->yGrid;
-            head->pastXGrid = head->xGrid;
-            head->yGrid--;
+            player->head->pastYGrid = player->head->yGrid;
+            player->head->pastXGrid = player->head->xGrid;
+            player->head->yGrid--;
             break;
         case SOUTH:
-            head->pastYGrid = head->yGrid;
-            head->pastXGrid = head->xGrid;
-            head->yGrid++;
+            player->head->pastYGrid = player->head->yGrid;
+            player->head->pastXGrid = player->head->xGrid;
+            player->head->yGrid++;
             break;
         case EAST:
-            head->pastYGrid = head->yGrid;
-            head->pastXGrid = head->xGrid;
-            head->xGrid++;
+            player->head->pastYGrid = player->head->yGrid;
+            player->head->pastXGrid = player->head->xGrid;
+            player->head->xGrid++;
             break;
         case WEST:
-            head->pastYGrid = head->yGrid;
-            head->pastXGrid = head->xGrid;
-            head->xGrid--;
+            player->head->pastYGrid = player->head->yGrid;
+            player->head->pastXGrid = player->head->xGrid;
+            player->head->xGrid--;
             break;
     }
 
     /* Move Body */
-    Body *current = head->next;
-    Body *previous = head;
+    Body *current = player->head->next;
+    Body *previous = player->head;
 
     while (current != NULL)
     {
@@ -382,13 +378,16 @@ unsigned int randr(unsigned int min, unsigned int max)
     return (max - min +1)*scaled + min;
 }
 
-void collisionCheck(GameState *game, Body *head, Apple *apple)
+void collisionCheck(GameState *game)
 {
+    Player *player = &game->player;
+    Apple *apple = &game->apple;
+
     // Apple collision
-    if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) )
+    if ( (player->head->xGrid == apple->xGrid) && (player->head->yGrid == apple->yGrid) )
     {
-        if (game->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
-            game->score += 10;
+        if (player->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
+            player->score += 10;
 
         while (1)
         {
@@ -398,10 +397,10 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
 
             // Check if location doesn't overlap with the snake
             int ok = 1;
-            if ( (head->xGrid == apple->xGrid) && (head->yGrid == apple->yGrid) )
+            if ( (player->head->xGrid == apple->xGrid) && (player->head->yGrid == apple->yGrid) )
                 ok = 0;
 
-            Body *current = head;
+            Body *current = player->head;
 
             while(current != NULL)
             {
@@ -418,37 +417,37 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
         }
 
         // Add body parts
-        game->parts++;
+        player->parts++;
     }
 
     // Body collision
-    Body *current = head->next;
+    Body *current = player->head->next;
 
     int i;
 
     while (current != NULL)
     {
-        if ( (head->xGrid == current->xGrid) && (head->yGrid == current->yGrid) )
+        if ( (player->head->xGrid == current->xGrid) && (player->head->yGrid == current->yGrid) )
         {
 
-            if (game->score >= game->highScores[4].value)
+            if (player->score >= game->highScores[4].value)
             {
                 for (i = 4; i > -1; i--)
                 {
-                    if (game->score < game->highScores[i].value)
+                    if (player->score < game->highScores[i].value)
                     {
                         shiftPlace(game, i+1);
 
                         strcpy( game->highScores[i+1].name, "---");
-                        game->highScores[i+1].value = game->score;
+                        game->highScores[i+1].value = player->score;
                         break;
                     }
-                    else if (game->score == game->highScores[i].value)
+                    else if (player->score == game->highScores[i].value)
                     {
                         shiftPlace(game, i);
 
                         strcpy( game->highScores[i].name, "---");
-                        game->highScores[i].value = game->score;
+                        game->highScores[i].value = player->score;
                         break;
                     }
                     else if (i == 0)
@@ -456,7 +455,7 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
                         shiftPlace(game, 0);
 
                         strcpy( game->highScores[0].name, "---");
-                        game->highScores[0].value = game->score;
+                        game->highScores[0].value = player->score;
                     }
                 }
                 game->state = BOARD;
@@ -474,28 +473,28 @@ void collisionCheck(GameState *game, Body *head, Apple *apple)
     // Outside boundary
 
     // up
-    if (head->yGrid < 3)
+    if (player->head->yGrid < 3)
     {
-        head->pastYGrid = head->yGrid;
-        head->yGrid = HEIGHT-2;
+        player->head->pastYGrid = player->head->yGrid;
+        player->head->yGrid = HEIGHT-2;
     }
     // down
-    else if (head->yGrid > HEIGHT-2)
+    else if (player->head->yGrid > HEIGHT-2)
     {
-        head->pastYGrid = head->yGrid;
-        head->yGrid = 3;
+        player->head->pastYGrid = player->head->yGrid;
+        player->head->yGrid = 3;
     }
     // right
-    if (head->xGrid > WIDTH-3)
+    if (player->head->xGrid > WIDTH-3)
     {
-        head->pastXGrid = head->xGrid;
-        head->xGrid = 2;
+        player->head->pastXGrid = player->head->xGrid;
+        player->head->xGrid = 2;
     }
     // left
-    else if (head->xGrid < 2)
+    else if (player->head->xGrid < 2)
     {
-        head->pastXGrid = head->xGrid;
-        head->xGrid = WIDTH-3;
+        player->head->pastXGrid = player->head->xGrid;
+        player->head->xGrid = WIDTH-3;
     }
 }
 

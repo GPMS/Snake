@@ -3,6 +3,6 @@
 
 #include "main.h"
 
-void doRender(GameState *game, Body *head, Body **tail, Apple *apple);
+void doRender(GameState *game);
 
 #endif

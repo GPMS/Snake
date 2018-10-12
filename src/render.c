@@ -47,7 +47,7 @@ void drawText(int inputX, int inputY, const char *text, TTF_Font* font, SDL_Colo
     SDL_FreeSurface(tmpSurface);
 }
 
-SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
+SDL_Renderer *drawGameScreen(const GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -58,7 +58,7 @@ SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
     /* Draw score */
     char str[128] = "";
 
-    sprintf(str, "score:%d", game->score);
+    sprintf(str, "score:%d", game->player.score);
     drawText(2 * BLOCK_SIZE, BLOCK_SIZE, str, game->font, white, renderer);
 
     sprintf(str, "highest:%d", game->highScores[0].value);
@@ -78,8 +78,8 @@ SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
     setRenderColor(renderer, red);
 
     SDL_Rect appleRect;
-    appleRect.x = apple.xGrid * BLOCK_SIZE;
-    appleRect.y = apple.yGrid * BLOCK_SIZE;
+    appleRect.x = game->apple.xGrid * BLOCK_SIZE;
+    appleRect.y = game->apple.yGrid * BLOCK_SIZE;
     appleRect.w = appleRect.h = BLOCK_SIZE - 5;
     
     SDL_RenderFillRect(renderer, &appleRect);
@@ -90,7 +90,7 @@ SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
     SDL_Rect snakeRect;
     snakeRect.w = snakeRect.h = BLOCK_SIZE - 5;
 
-    Body *current = head;
+    Body *current = game->player.head;
 
     while (current != NULL)
     {
@@ -106,7 +106,7 @@ SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
 }
 
 
-SDL_Renderer *drawPauseScreen(GameState *game)
+SDL_Renderer *drawPauseScreen(const GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -116,7 +116,7 @@ SDL_Renderer *drawPauseScreen(GameState *game)
 
     // Draw score
     char str[128] = "";
-    sprintf(str, "score:%d", game->score);
+    sprintf(str, "score:%d", game->player.score);
 
     drawText(BLOCK_SIZE, BLOCK_SIZE, str, game->font, white, renderer);
 
@@ -140,7 +140,7 @@ SDL_Renderer *drawPauseScreen(GameState *game)
 }
 
 
-SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *apple)
+SDL_Renderer *newHighscore(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -153,7 +153,7 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
     int placeNum;
     for (i = 4; i > -1; i--)
     {
-        if (game->score < game->highScores[i].value)
+        if (game->player.score < game->highScores[i].value)
         {
             placeNum = i+2;
             break;
@@ -196,12 +196,12 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 
     drawText(CENTERED, 18 * BLOCK_SIZE, game->text, game->font, white, renderer);
 
-    game->pos = placeNum - 1;
+    game->player.pos = placeNum - 1;
 
     if (game->ok == 1)
     {
-        strcpy(game->highScores[game->pos].name, game->text);
-        ResetGame(game, head, tail, apple);
+        strcpy(game->highScores[game->player.pos].name, game->text);
+        ResetGame(game);
         game->state = GAME;
     }
     else if (game->ok == 3)
@@ -213,7 +213,7 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
 }
 
 
-SDL_Renderer *drawPlaces(GameState *game, int curPlace)
+SDL_Renderer *drawPlaces(const GameState *game, int curPlace)
 {
     SDL_Renderer *renderer = game->renderer;
     char str[128] = "";
@@ -230,7 +230,7 @@ SDL_Renderer *drawPlaces(GameState *game, int curPlace)
 }
 
 
-SDL_Renderer *drawHighscoreScreen(GameState *game, Body *head, Body **tail, Apple *apple)
+SDL_Renderer *drawHighscoreScreen(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -242,7 +242,7 @@ SDL_Renderer *drawHighscoreScreen(GameState *game, Body *head, Body **tail, Appl
 
     renderer = drawPlaces(game, 0);
 
-    renderer = newHighscore(game, head, tail, apple);
+    renderer = newHighscore(game);
 
     return renderer;
 }
@@ -261,7 +261,7 @@ SDL_Renderer *drawGameOverScreen(GameState *game)
 
     char str[128];
 
-    sprintf(str, "Score: %d", game->score);
+    sprintf(str, "Score: %d", game->player.score);
 
     drawText(CENTERED, 7 * BLOCK_SIZE, str, game->font, white, renderer);
 
@@ -276,7 +276,6 @@ SDL_Renderer *drawGameOverScreen(GameState *game)
             break;
         case 1:
             game->gameOver = 0;
-            ResetGame(game, )
             game->state = GAME;
             break;
     }
@@ -285,14 +284,14 @@ SDL_Renderer *drawGameOverScreen(GameState *game)
 }
 
 
-void doRender(GameState *game, Body *head, Body **tail, Apple *apple)
+void doRender(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
     switch(game->state)
     {
         case GAME:
-            renderer = drawGameScreen(game, head, *apple);
+            renderer = drawGameScreen(game);
             break;
         case PAUSE:
             renderer = drawPauseScreen(game);
@@ -301,7 +300,7 @@ void doRender(GameState *game, Body *head, Body **tail, Apple *apple)
             renderer = drawGameOverScreen(game);
             break;
         case BOARD:
-            renderer = drawHighscoreScreen(game, head, tail, apple);
+            renderer = drawHighscoreScreen(game);
             break;
     }
 

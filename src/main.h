@@ -21,6 +21,17 @@ typedef struct Body {
 } Body;
 
 typedef struct {
+    Body *head;
+    Body *tail;
+
+    int pos;
+    int direction;
+    int parts;
+    int partsDrawn;
+    int score;
+} Player;
+
+typedef struct {
     int xGrid, yGrid;
 } Apple;
 
@@ -37,17 +48,13 @@ typedef struct {
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    /* Player */
-    int pos;
-    int direction;
-    int parts;
-    int partsDrawn;
-    int score;
+    Player player;
+    Apple apple;
+
     int asw;
     int gameOver;
     Score highScores[5];
 
-    SDL_Texture *label;
     TTF_Font *font;
 
     char text[4];
@@ -58,6 +65,6 @@ typedef struct {
 } GameState;
 
 int processEvents(GameState *game);
-void ResetGame(GameState *game, Body *head, Body **tail, Apple *apple);
+void ResetGame(GameState *game);
 
 #endif
