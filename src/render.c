@@ -4,77 +4,99 @@
 
 #include "render.h"
 
+#define CENTERED -1
 
-SDL_Renderer *drawGame(GameState *game, Body *head, Apple apple)
+// Colors
+//                             R    G    B    A
+SDL_Color white         =   { 255, 255, 255, 255 };
+SDL_Color lightGrey     =   { 192, 192, 192, 255 };
+SDL_Color grey          =   {  50,  50,  50, 255 };
+SDL_Color black         =   {   0,   0,   0, 255 };
+SDL_Color red           =   { 255,   0,   0, 255 };
+SDL_Color green         =   {   0, 255,   0, 255 };
+SDL_Color blue          =   {   0,   0, 255, 255 };
+SDL_Color lightPink     =   { 255, 153, 153, 255 };
+SDL_Color orange        =   { 255, 128,   0, 255 };
+SDL_Color lightOrange   =   { 255, 178, 102, 255 };
+SDL_Color lightBlue     =   {  51, 255, 255, 255 };
+SDL_Color yellow        =   { 255, 255,   0, 255 };
+
+void setRenderColor(SDL_Renderer *renderer, SDL_Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+}
+
+void drawText(int inputX, int inputY, const char *text, TTF_Font* font, SDL_Color color, SDL_Renderer *renderer)
+{
+    SDL_Texture *label = NULL;
+    SDL_Surface *tmpSurface = NULL;
+    int x, y;
+    
+    tmpSurface = TTF_RenderText_Blended(font, text, color);
+    label = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+
+    if (inputX == CENTERED) x = (WIDTH*BLOCK_SIZE - tmpSurface->w)/2;
+    else                    x = inputX;
+    
+    if (inputY == CENTERED) y = (HEIGHT*BLOCK_SIZE - tmpSurface->h)/2;
+    else                    y = inputY;
+    
+    SDL_Rect textRect = {x, y, tmpSurface->w, tmpSurface->h};
+    
+    SDL_RenderCopy(renderer, label, NULL, &textRect);
+    SDL_FreeSurface(tmpSurface);
+}
+
+SDL_Renderer *drawGameScreen(GameState *game, Body *head, Apple apple)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color white = {
-        255, 255, 255,
-        255
-    };
 
     /* Draw black background */
-    SDL_SetRenderDrawColor(
-        renderer,
-        0, 0, 0,
-        255
-    );
+    setRenderColor(renderer, black);
     SDL_RenderClear(renderer);
 
     /* Draw score */
     char str[128] = "";
-    sprintf(str, "score:%d", game->score);
 
-    SDL_Surface *score = TTF_RenderText_Blended(game->font, str, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, score);
-    SDL_Rect textRect = {2*BLOCK_SIZE, BLOCK_SIZE, score->w, score->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
-    SDL_FreeSurface(score);
+    sprintf(str, "score:%d", game->score);
+    drawText(2 * BLOCK_SIZE, BLOCK_SIZE, str, game->font, white, renderer);
 
     sprintf(str, "highest:%d", game->highScores[0].value);
-
-    SDL_Surface *highest = TTF_RenderText_Blended(game->font, str, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, highest);
-    SDL_Rect highestRect = {(WIDTH-13)*BLOCK_SIZE, BLOCK_SIZE, highest->w, highest->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &highestRect);
-    SDL_FreeSurface(highest);
+    drawText((WIDTH - 13) * BLOCK_SIZE, BLOCK_SIZE, str, game->font, white, renderer);
 
     /* Draw main screen */
-    SDL_SetRenderDrawColor(
-        renderer,
-        50, 50, 50,
-        255
-        );
+    setRenderColor(renderer, grey);
+
     SDL_Rect mainScreen = {
         2*BLOCK_SIZE, 3*BLOCK_SIZE,
         22*BLOCK_SIZE, 22*BLOCK_SIZE
     };
+
     SDL_RenderFillRect(renderer, &mainScreen);
 
     /* Draw apple */
-    SDL_SetRenderDrawColor(
-        renderer,
-        255, 0, 0,
-        255
-    );
-    SDL_Rect appleRect = { apple.xGrid*BLOCK_SIZE, apple.yGrid*BLOCK_SIZE, BLOCK_SIZE-5, BLOCK_SIZE-5 };
+    setRenderColor(renderer, red);
+
+    SDL_Rect appleRect;
+    appleRect.x = apple.xGrid * BLOCK_SIZE;
+    appleRect.y = apple.yGrid * BLOCK_SIZE;
+    appleRect.w = appleRect.h = BLOCK_SIZE - 5;
+    
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
-    SDL_SetRenderDrawColor(
-        renderer,
-        0, 255, 0,
-        255
-    );
+    setRenderColor(renderer, green);
+
+    SDL_Rect snakeRect;
+    snakeRect.w = snakeRect.h = BLOCK_SIZE - 5;
 
     Body *current = head;
 
     while (current != NULL)
     {
-        SDL_Rect snakeRect = {
-            current->xGrid*BLOCK_SIZE, current->yGrid*BLOCK_SIZE, 
-            BLOCK_SIZE-5, BLOCK_SIZE-5
-        };
+        snakeRect.x = current->xGrid*BLOCK_SIZE;
+        snakeRect.y = current->yGrid*BLOCK_SIZE;
+
         SDL_RenderFillRect(renderer, &snakeRect);
 
         current = current->next;
@@ -84,60 +106,35 @@ SDL_Renderer *drawGame(GameState *game, Body *head, Apple apple)
 }
 
 
-SDL_Renderer *drawPause(GameState *game)
+SDL_Renderer *drawPauseScreen(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color white = {
-        255, 255, 255, 
-        255
-    };
 
     // Clear playground
-    SDL_SetRenderDrawColor(
-        renderer,
-        0, 0, 0,
-        255
-    );
+    setRenderColor(renderer, black);
     SDL_RenderClear(renderer);
 
     // Draw score
     char str[128] = "";
     sprintf(str, "score:%d", game->score);
 
-    SDL_Surface *tmp1 = TTF_RenderText_Blended(game->font, str, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, tmp1);
-    SDL_Rect scoreRect = {BLOCK_SIZE, BLOCK_SIZE, tmp1->w, tmp1->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &scoreRect);
-    SDL_FreeSurface(tmp1);
+    drawText(BLOCK_SIZE, BLOCK_SIZE, str, game->font, white, renderer);
 
     // Draw main screen
-    SDL_SetRenderDrawColor(
-        renderer,
-        50, 50, 50,
-        255
-    );
-    SDL_Rect mainScreen = { 2*BLOCK_SIZE, 3*BLOCK_SIZE, 22*BLOCK_SIZE, 22*BLOCK_SIZE };
+    setRenderColor(renderer, grey);
+
+    SDL_Rect mainScreen;
+    mainScreen.x = 2*BLOCK_SIZE;
+    mainScreen.y = 3*BLOCK_SIZE;
+    mainScreen.w = mainScreen.h = 22*BLOCK_SIZE;
+
     SDL_RenderFillRect(renderer, &mainScreen);
 
     // Draw pause
-    SDL_Surface *tmp2 = TTF_RenderText_Blended(game->font, "PAUSED", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, tmp2);
-    SDL_Rect pauseRect = {
-        10 * BLOCK_SIZE, 5 * BLOCK_SIZE,
-        tmp2->w, tmp2->h
-    };
-    SDL_RenderCopy(renderer, game->label, NULL, &pauseRect);
-    SDL_FreeSurface(tmp2);
+    drawText(CENTERED, 5 * BLOCK_SIZE, "PAUSED", game->font, white, renderer);
 
     // Draw instructions
-    SDL_Surface *tmp3 = TTF_RenderText_Blended(game->font, "Press p to continue", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, tmp3);
-    SDL_Rect textRect = {
-        4 * BLOCK_SIZE, 10 * BLOCK_SIZE,
-        tmp3->w, tmp3->h
-    };
-    SDL_RenderCopy(game->renderer, game->label, NULL, &textRect);
-    SDL_FreeSurface(tmp3);
+    drawText(CENTERED, CENTERED, "Press p to continue", game->font, white, renderer);
 
     return renderer;
 }
@@ -146,14 +143,8 @@ SDL_Renderer *drawPause(GameState *game)
 SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *apple)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color white = {255, 255, 255, 255};
 
-    SDL_Surface *new = TTF_RenderText_Blended(game->font, "New Highscore!", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, new);
-    SDL_Rect newRect = {(WIDTH*BLOCK_SIZE - new->w)/2, 15 * BLOCK_SIZE, new->w, new->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &newRect);
-    SDL_FreeSurface(new);
-
+    drawText(CENTERED, 15 * BLOCK_SIZE, "New Highscore!", game->font, white, renderer);
 
     /* Show place and score */
     char place[4];
@@ -198,26 +189,12 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
     char str[128] = "";
     sprintf(str, "%s place", place);
 
-    SDL_Surface *scr = TTF_RenderText_Blended(game->font, str, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, scr);
-    SDL_Rect scrRect = {(WIDTH*BLOCK_SIZE - scr->w)/2, 16 * BLOCK_SIZE, scr->w, scr->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &scrRect);
-    SDL_FreeSurface(scr);
+    drawText(CENTERED, 16 * BLOCK_SIZE, str, game->font, white, renderer);
 
     /* Prompt */
-    SDL_Surface *prmt = TTF_RenderText_Blended(game->font, "INPUT YOUR NAME", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, prmt);
-    SDL_Rect prmtRect = {(WIDTH*BLOCK_SIZE - prmt->w)/2, 17 * BLOCK_SIZE, prmt->w, prmt->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &prmtRect);
-    SDL_FreeSurface(prmt);
+    drawText(CENTERED, 17 * BLOCK_SIZE, "Input your name", game->font, white, renderer);
 
-    SDL_Surface *txt = TTF_RenderText_Blended(game->font, game->text, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, txt);
-    SDL_Rect txtRect = {(WIDTH*BLOCK_SIZE - txt->w)/2, 18*BLOCK_SIZE, txt->w, txt->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &txtRect);
-    SDL_FreeSurface(txt);
-
-    //if (game->state == BOARD)   printf("BOARD\n");
+    drawText(CENTERED, 18 * BLOCK_SIZE, game->text, game->font, white, renderer);
 
     game->pos = placeNum - 1;
 
@@ -229,11 +206,7 @@ SDL_Renderer *newHighscore(GameState *game, Body *head, Body **tail, Apple *appl
     }
     else if (game->ok == 3)
     {
-        SDL_Surface *warn = TTF_RenderText_Blended(game->font, "AT LEAST 3 CHARACTERS", white);
-        game->label = SDL_CreateTextureFromSurface(renderer, warn);
-        SDL_Rect warnRect = {(WIDTH*BLOCK_SIZE - warn->w)/2, 19 * BLOCK_SIZE, warn->w, warn->h};
-        SDL_RenderCopy(renderer, game->label, NULL, &warnRect);
-        SDL_FreeSurface(warn);
+        drawText(CENTERED, 19 * BLOCK_SIZE, "At least 3 characters", game->font, white, renderer);
     }
 
     return renderer;
@@ -245,54 +218,27 @@ SDL_Renderer *drawPlaces(GameState *game, int curPlace)
     SDL_Renderer *renderer = game->renderer;
     char str[128] = "";
 
-    SDL_Color colours[5] = {
-        {192, 192, 192, 255},
-        {255,   0,   0, 255},
-        {255, 128,   0, 255},
-        {255, 153, 153, 255},
-        {255, 178, 102, 255}
-    };
+    SDL_Color colours[5] = { lightGrey, red, orange, lightPink, lightOrange };
 
-    if (curPlace == 5) {
-        return renderer;
-    }
+    if (curPlace == 5)  return renderer;
+    
     sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game->highScores[curPlace].value, game->highScores[curPlace].name);
 
-    SDL_Surface *place = TTF_RenderText_Blended(game->font, str, colours[curPlace]);
-    game->label = SDL_CreateTextureFromSurface(renderer, place);
-    SDL_Rect placeRect = {(WIDTH*BLOCK_SIZE - place->w)/2, (5+curPlace) * BLOCK_SIZE, place->w, place->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &placeRect);
-    SDL_FreeSurface(place);
+    drawText(CENTERED, (5 + curPlace) * BLOCK_SIZE, str, game->font, colours[curPlace], renderer);
 
-    curPlace+=1;
-
-    return drawPlaces(game, curPlace);
+    return drawPlaces(game, ++curPlace);
 }
 
 
-SDL_Renderer *drawBoard(GameState *game, Body *head, Body **tail, Apple *apple)
+SDL_Renderer *drawHighscoreScreen(GameState *game, Body *head, Body **tail, Apple *apple)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color lblue    =   { 51, 255, 255, 255};
-    SDL_Color yellow   =   {255, 255,   0, 255};
 
-    SDL_SetRenderDrawColor(renderer,
-        0, 0, 0,
-        255
-        );
+    setRenderColor(renderer, black);
     SDL_RenderClear(renderer);
 
-    SDL_Surface *title = TTF_RenderText_Blended(game->font, "Highscore Board", lblue);
-    game->label = SDL_CreateTextureFromSurface(renderer, title);
-    SDL_Rect titleRect = {(WIDTH*BLOCK_SIZE - title->w)/2, 2 * BLOCK_SIZE, title->w, title->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &titleRect);
-    SDL_FreeSurface(title);
-
-    SDL_Surface *text = TTF_RenderText_Blended(game->font, "Place\tScore\tName", yellow);
-    game->label = SDL_CreateTextureFromSurface(renderer, text);
-    SDL_Rect textRect = {(WIDTH*BLOCK_SIZE - text->w)/2, 4 * BLOCK_SIZE, text->w, text->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &textRect);
-    SDL_FreeSurface(text);
+    drawText(CENTERED, 2 * BLOCK_SIZE, "Highscore Board", game->font, lightBlue, renderer);
+    drawText(CENTERED, 4 * BLOCK_SIZE, "Place\tScore\tName", game->font, yellow, renderer);
 
     renderer = drawPlaces(game, 0);
 
@@ -302,42 +248,26 @@ SDL_Renderer *drawBoard(GameState *game, Body *head, Body **tail, Apple *apple)
 }
 
 
-SDL_Renderer *drawGameOver(GameState *game)
+SDL_Renderer *drawGameOverScreen(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
-    SDL_Color white = {255, 255, 255, 255};
 
     /* Draw black background */
-    SDL_SetRenderDrawColor(renderer,
-        0, 0, 0,
-        255
-        );
+    setRenderColor(renderer, black);
     SDL_RenderClear(renderer);
 
     /* Write gameover */
-    SDL_Surface *over = TTF_RenderText_Blended(game->font, "GameOver", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, over);
-    SDL_Rect overRect = {(WIDTH*BLOCK_SIZE - over->w)/2, 5 * BLOCK_SIZE, over->w, over->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &overRect);
-    SDL_FreeSurface(over);
+    drawText(CENTERED, 5 * BLOCK_SIZE, "GameOver", game->font, white, renderer);
 
     char str[128];
 
     sprintf(str, "Score: %d", game->score);
 
-    SDL_Surface *pts = TTF_RenderText_Blended(game->font, str, white);
-    game->label = SDL_CreateTextureFromSurface(renderer, pts);
-    SDL_Rect ptsRect = {(WIDTH*BLOCK_SIZE - pts->w)/2, 7 * BLOCK_SIZE, pts->w, pts->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &ptsRect);
-    SDL_FreeSurface(pts);
+    drawText(CENTERED, 7 * BLOCK_SIZE, str, game->font, white, renderer);
 
     /* Continue? */
     game->gameOver = 1;
-    SDL_Surface *prmt = TTF_RenderText_Blended(game->font, "CONTINUE? (Y/N)", white);
-    game->label = SDL_CreateTextureFromSurface(renderer, prmt);
-    SDL_Rect prmtRect = {(WIDTH*BLOCK_SIZE - prmt->w)/2, 20 * BLOCK_SIZE, prmt->w, prmt->h};
-    SDL_RenderCopy(renderer, game->label, NULL, &prmtRect);
-    SDL_FreeSurface(prmt);
+    drawText(CENTERED, CENTERED, "Continue? (Y/N)", game->font, white, renderer);
 
     switch(game->asw)
     {
@@ -346,6 +276,7 @@ SDL_Renderer *drawGameOver(GameState *game)
             break;
         case 1:
             game->gameOver = 0;
+            ResetGame(game, )
             game->state = GAME;
             break;
     }
@@ -361,16 +292,16 @@ void doRender(GameState *game, Body *head, Body **tail, Apple *apple)
     switch(game->state)
     {
         case GAME:
-            renderer = drawGame(game, head, *apple);
+            renderer = drawGameScreen(game, head, *apple);
             break;
         case PAUSE:
-            renderer = drawPause(game);
+            renderer = drawPauseScreen(game);
             break;
         case GAMEOVER:
-            renderer = drawGameOver(game);
+            renderer = drawGameOverScreen(game);
             break;
         case BOARD:
-            renderer = drawBoard(game, head, tail, apple);
+            renderer = drawHighscoreScreen(game, head, tail, apple);
             break;
     }
 
