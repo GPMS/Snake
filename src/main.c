@@ -378,16 +378,13 @@ unsigned int randr(unsigned int min, unsigned int max)
     return (max - min +1)*scaled + min;
 }
 
-void collisionCheck(GameState *game)
-{
-    Player *player = &game->player;
-    Apple *apple = &game->apple;
 
-    // Apple collision
+void snakeAppleCollision(Player *player, Apple *apple)
+{
     if ( (player->head->xGrid == apple->xGrid) && (player->head->yGrid == apple->yGrid) )
     {
         if (player->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
-            player->score += 10;
+                player->score += 10;
 
         while (1)
         {
@@ -419,20 +416,20 @@ void collisionCheck(GameState *game)
         // Add body parts
         player->parts++;
     }
+}
 
-    // Body collision
+void snakeSnakeCollision(GameState *game)
+{
+    Player *player = &game->player;
+
     Body *current = player->head->next;
-
-    int i;
-
     while (current != NULL)
     {
         if ( (player->head->xGrid == current->xGrid) && (player->head->yGrid == current->yGrid) )
         {
-
             if (player->score >= game->highScores[4].value)
             {
-                for (i = 4; i > -1; i--)
+                for (int i = 4; i > -1; i--)
                 {
                     if (player->score < game->highScores[i].value)
                     {
@@ -469,33 +466,41 @@ void collisionCheck(GameState *game)
         }
         current = current->next;
     }
+}
 
-    // Outside boundary
-
+void snakeWallCollision(Body *head)
+{
     // up
-    if (player->head->yGrid < 3)
+    if (head->yGrid < 3)
     {
-        player->head->pastYGrid = player->head->yGrid;
-        player->head->yGrid = HEIGHT-2;
+        head->pastYGrid = head->yGrid;
+        head->yGrid = HEIGHT-2;
     }
     // down
-    else if (player->head->yGrid > HEIGHT-2)
+    else if (head->yGrid > HEIGHT-2)
     {
-        player->head->pastYGrid = player->head->yGrid;
-        player->head->yGrid = 3;
+        head->pastYGrid = head->yGrid;
+        head->yGrid = 3;
     }
     // right
-    if (player->head->xGrid > WIDTH-3)
+    if (head->xGrid > WIDTH-3)
     {
-        player->head->pastXGrid = player->head->xGrid;
-        player->head->xGrid = 2;
+        head->pastXGrid = head->xGrid;
+        head->xGrid = 2;
     }
     // left
-    else if (player->head->xGrid < 2)
+    else if (head->xGrid < 2)
     {
-        player->head->pastXGrid = player->head->xGrid;
-        player->head->xGrid = WIDTH-3;
+        head->pastXGrid = head->xGrid;
+        head->xGrid = WIDTH-3;
     }
+}
+
+void collisionCheck(GameState *game)
+{
+    snakeAppleCollision(&game->player, &game->apple);
+    snakeSnakeCollision(game);
+    snakeWallCollision(game->player.head);
 }
 
 
