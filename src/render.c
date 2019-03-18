@@ -31,18 +31,18 @@ void drawText(int inputX, int inputY, const char *text, TTF_Font* font, SDL_Colo
     SDL_Texture *label = NULL;
     SDL_Surface *tmpSurface = NULL;
     int x, y;
-    
+
     tmpSurface = TTF_RenderText_Blended(font, text, color);
     label = SDL_CreateTextureFromSurface(renderer, tmpSurface);
 
     if (inputX == CENTERED) x = (WIDTH*BLOCK_SIZE - tmpSurface->w)/2;
     else                    x = inputX;
-    
+
     if (inputY == CENTERED) y = (HEIGHT*BLOCK_SIZE - tmpSurface->h)/2;
     else                    y = inputY;
-    
+
     SDL_Rect textRect = {x, y, tmpSurface->w, tmpSurface->h};
-    
+
     SDL_RenderCopy(renderer, label, NULL, &textRect);
     SDL_FreeSurface(tmpSurface);
 }
@@ -81,7 +81,7 @@ SDL_Renderer *drawGameScreen(const GameState *game)
     appleRect.x = game->apple.xGrid * BLOCK_SIZE;
     appleRect.y = game->apple.yGrid * BLOCK_SIZE;
     appleRect.w = appleRect.h = BLOCK_SIZE - 5;
-    
+
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
@@ -140,7 +140,7 @@ SDL_Renderer *drawPauseScreen(const GameState *game)
 }
 
 
-SDL_Renderer *newHighscore(GameState *game)
+SDL_Renderer *drawNewHighscore(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -221,7 +221,7 @@ SDL_Renderer *drawPlaces(const GameState *game, int curPlace)
     SDL_Color colours[5] = { lightGrey, red, orange, lightPink, lightOrange };
 
     if (curPlace == 5)  return renderer;
-    
+
     sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game->highScores[curPlace].value, game->highScores[curPlace].name);
 
     drawText(CENTERED, (5 + curPlace) * BLOCK_SIZE, str, game->font, colours[curPlace], renderer);
@@ -242,7 +242,7 @@ SDL_Renderer *drawHighscoreScreen(GameState *game)
 
     renderer = drawPlaces(game, 0);
 
-    renderer = newHighscore(game);
+    renderer = drawNewHighscore(game);
 
     return renderer;
 }

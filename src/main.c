@@ -381,7 +381,8 @@ unsigned int randr(unsigned int min, unsigned int max)
 
 void snakeAppleCollision(Player *player, Apple *apple)
 {
-    if ( (player->head->xGrid == apple->xGrid) && (player->head->yGrid == apple->yGrid) )
+    if ((player->head->xGrid == apple->xGrid) &&
+        (player->head->yGrid == apple->yGrid))
     {
         if (player->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
                 player->score += 10;
@@ -394,14 +395,16 @@ void snakeAppleCollision(Player *player, Apple *apple)
 
             // Check if location doesn't overlap with the snake
             int ok = 1;
-            if ( (player->head->xGrid == apple->xGrid) && (player->head->yGrid == apple->yGrid) )
+            if ((player->head->xGrid == apple->xGrid) &&
+                (player->head->yGrid == apple->yGrid))
                 ok = 0;
 
             Body *current = player->head;
 
             while(current != NULL)
             {
-                if ( (apple->xGrid == current->xGrid) && (apple->yGrid == current->yGrid) )
+                if ((apple->xGrid == current->xGrid) &&
+                    (apple->yGrid == current->yGrid))
                 {
                     ok = 0;
                     break;
@@ -418,6 +421,40 @@ void snakeAppleCollision(Player *player, Apple *apple)
     }
 }
 
+void newHighscore(GameState *game)
+{
+    Player *player = &game->player;
+
+    for (int i = 4; i > -1; i--)
+    {
+        if (player->score < game->highScores[i].value)
+        {
+            shiftPlace(game, i+1);
+
+            strcpy( game->highScores[i+1].name, "---");
+            game->highScores[i+1].value = player->score;
+            break;
+        }
+        else if (player->score == game->highScores[i].value)
+        {
+            shiftPlace(game, i);
+
+            strcpy( game->highScores[i].name, "---");
+            game->highScores[i].value = player->score;
+            break;
+        }
+        else if (i == 0)
+        {
+            shiftPlace(game, 0);
+
+            strcpy( game->highScores[0].name, "---");
+            game->highScores[0].value = player->score;
+        }
+    }
+
+    game->state = BOARD;
+}
+
 void snakeSnakeCollision(GameState *game)
 {
     Player *player = &game->player;
@@ -425,38 +462,14 @@ void snakeSnakeCollision(GameState *game)
     Body *current = player->head->next;
     while (current != NULL)
     {
-        if ( (player->head->xGrid == current->xGrid) && (player->head->yGrid == current->yGrid) )
+        if ((player->head->xGrid == current->xGrid) &&
+            (player->head->yGrid == current->yGrid))
         {
+            // Collision!
+
             if (player->score >= game->highScores[4].value)
             {
-                for (int i = 4; i > -1; i--)
-                {
-                    if (player->score < game->highScores[i].value)
-                    {
-                        shiftPlace(game, i+1);
-
-                        strcpy( game->highScores[i+1].name, "---");
-                        game->highScores[i+1].value = player->score;
-                        break;
-                    }
-                    else if (player->score == game->highScores[i].value)
-                    {
-                        shiftPlace(game, i);
-
-                        strcpy( game->highScores[i].name, "---");
-                        game->highScores[i].value = player->score;
-                        break;
-                    }
-                    else if (i == 0)
-                    {
-                        shiftPlace(game, 0);
-
-                        strcpy( game->highScores[0].name, "---");
-                        game->highScores[0].value = player->score;
-                    }
-                }
-                game->state = BOARD;
-
+                newHighscore(game);
             }
             else
             {
