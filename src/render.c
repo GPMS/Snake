@@ -47,7 +47,7 @@ void drawText(int inputX, int inputY, const char *text, TTF_Font* font, SDL_Colo
     SDL_FreeSurface(tmpSurface);
 }
 
-SDL_Renderer *drawGameScreen(const GameState *game)
+void drawGameScreen(const GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -101,12 +101,10 @@ SDL_Renderer *drawGameScreen(const GameState *game)
 
         current = current->next;
     }
-
-    return renderer;
 }
 
 
-SDL_Renderer *drawPauseScreen(const GameState *game)
+void drawPauseScreen(const GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -135,12 +133,10 @@ SDL_Renderer *drawPauseScreen(const GameState *game)
 
     // Draw instructions
     drawText(CENTERED, CENTERED, "Press p to continue", game->font, white, renderer);
-
-    return renderer;
 }
 
 
-SDL_Renderer *drawNewHighscore(GameState *game)
+void drawNewHighscore(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -208,29 +204,27 @@ SDL_Renderer *drawNewHighscore(GameState *game)
     {
         drawText(CENTERED, 19 * BLOCK_SIZE, "At least 3 characters", game->font, white, renderer);
     }
-
-    return renderer;
 }
 
 
-SDL_Renderer *drawPlaces(const GameState *game, int curPlace)
+void drawPlaces(const GameState *game, int curPlace)
 {
     SDL_Renderer *renderer = game->renderer;
     char str[128] = "";
 
     SDL_Color colours[5] = { lightGrey, red, orange, lightPink, lightOrange };
 
-    if (curPlace == 5)  return renderer;
+    if (curPlace == 5)  return;
 
     sprintf(str, "  %d  \t%5d\t %s", curPlace+1, game->highScores[curPlace].value, game->highScores[curPlace].name);
 
     drawText(CENTERED, (5 + curPlace) * BLOCK_SIZE, str, game->font, colours[curPlace], renderer);
 
-    return drawPlaces(game, ++curPlace);
+    drawPlaces(game, ++curPlace);
 }
 
 
-SDL_Renderer *drawHighscoreScreen(GameState *game)
+void drawHighscoreScreen(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -240,15 +234,13 @@ SDL_Renderer *drawHighscoreScreen(GameState *game)
     drawText(CENTERED, 2 * BLOCK_SIZE, "Highscore Board", game->font, lightBlue, renderer);
     drawText(CENTERED, 4 * BLOCK_SIZE, "Place\tScore\tName", game->font, yellow, renderer);
 
-    renderer = drawPlaces(game, 0);
+    drawPlaces(game, 0);
 
-    renderer = drawNewHighscore(game);
-
-    return renderer;
+    drawNewHighscore(game);
 }
 
 
-SDL_Renderer *drawGameOverScreen(GameState *game)
+void drawGameOverScreen(GameState *game)
 {
     SDL_Renderer *renderer = game->renderer;
 
@@ -280,32 +272,28 @@ SDL_Renderer *drawGameOverScreen(GameState *game)
             game->state = GAME;
             break;
     }
-
-    return renderer;
 }
 
 
 void doRender(GameState *game)
 {
-    SDL_Renderer *renderer = game->renderer;
-
     switch(game->state)
     {
         case GAME:
-            renderer = drawGameScreen(game);
+            drawGameScreen(game);
             break;
         case PAUSE:
-            renderer = drawPauseScreen(game);
+            drawPauseScreen(game);
             break;
         case GAMEOVER:
-            renderer = drawGameOverScreen(game);
+            drawGameOverScreen(game);
             break;
         case BOARD:
-            renderer = drawHighscoreScreen(game);
+            drawHighscoreScreen(game);
             break;
     }
 
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(game->renderer);
 
     if (game->ok == 3)
     {
