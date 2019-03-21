@@ -393,12 +393,8 @@ void snakeAppleCollision(Player *player, Apple *apple)
             apple->xGrid = randr(2, WIDTH-3);
             apple->yGrid = randr(3, HEIGHT-2);
 
-            // Check if location doesn't overlap with the snake
+            /* Check if location doesn't overlap with the snake */
             int ok = 1;
-            if ((player->head->xGrid == apple->xGrid) &&
-                (player->head->yGrid == apple->yGrid))
-                ok = 0;
-
             Body *current = player->head;
 
             while(current != NULL)
