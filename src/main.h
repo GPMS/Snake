@@ -1,5 +1,4 @@
-#ifndef MAIN_H
-#define MAIN_H
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -17,12 +16,12 @@ enum state { GAME, PAUSE, GAMEOVER, PROMPT, SAVE, BOARD };
 typedef struct Body {
     int pastXGrid, pastYGrid;
     int xGrid, yGrid;
-    struct Body *next;
+    struct Body* next;
 } Body;
 
 typedef struct {
-    Body *head;
-    Body *tail;
+    Body* head;
+    Body* tail;
 
     int pos;
     int direction;
@@ -45,8 +44,8 @@ typedef struct {
     int state;
     int ok;
 
-    SDL_Window *window;
-    SDL_Renderer *renderer;
+    SDL_Window* window;
+    SDL_Renderer* renderer;
 
     Player player;
     Apple apple;
@@ -58,13 +57,10 @@ typedef struct {
     TTF_Font *font;
 
     char text[4];
-    char *composition;
+    char* composition;
     Sint32 cursor;
     Sint32 selection_len;
-    int l;
+    int inputLength;
 } GameState;
 
-int processEvents(GameState *game);
-void ResetGame(GameState *game);
-
-#endif
+void InitGame(GameState* game);

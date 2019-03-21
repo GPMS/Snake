@@ -1,8 +1,5 @@
-#ifndef RENDER_H
-#define RENDER_H
+#pragma once
 
 #include "main.h"
 
-void doRender(GameState *game);
-
-#endif
+void Render(GameState* game);
