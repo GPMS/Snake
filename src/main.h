@@ -63,4 +63,4 @@ typedef struct {
     int inputLength;
 } GameState;
 
-void InitGame(GameState* game);
+void ResetGame(GameState* game);

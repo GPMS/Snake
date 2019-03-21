@@ -15,6 +15,8 @@ void    MoveSnake(GameState* game);
 void    CollisionCheck(GameState* game);
 Body*   AddBody(Body* tail);
 void    InitPlayer(Player* player);
+void GetRandomApplePos(Player* player, Apple* apple);
+void    InitGame(GameState* game);
 void    DeleteSnake(Body* head);
 void    LoadHighScore(GameState* game);
 void    SaveHighScore(const GameState* game);
@@ -22,14 +24,10 @@ void    SaveHighScore(const GameState* game);
 
 int main(int argc, char* argv[])
 {
-    GameState game;
-    game.state = GAME;
-    game.gameOver = 0;
-    game.asw = 3;
-    game.ok = 0;
+    srand((int)time(NULL));
 
-    strcpy(game.text, "---");
-    game.inputLength = 0;
+    GameState game;
+    InitGame(&game);
 
     LoadHighScore(&game);
 
@@ -45,14 +43,8 @@ int main(int argc, char* argv[])
                                        -1,
                                        SDL_RENDERER_ACCELERATED);
 
-    game.running = SDL_TRUE;
-
     InitPlayer(&game.player);
-
-    game.apple.xGrid = 4;
-    game.apple.yGrid = 10;
-
-    srand((int)time(NULL));
+    GetRandomApplePos(&game.player, &game.apple);
 
     game.font = NULL;
     game.font = TTF_OpenFont("font/emulogic.ttf", 24);
@@ -168,21 +160,61 @@ void InitPlayer(Player* player)
     player->head->next = NULL;
 }
 
+unsigned int randr(unsigned int min, unsigned int max)
+{
+    double scaled = (double)rand()/RAND_MAX;
+
+    return (max - min +1)*scaled + min;
+}
+
+
+void GetRandomApplePos(Player* player, Apple* apple)
+{
+    while (1)
+    {
+        /* Change apple location */
+        apple->xGrid = randr(2, WIDTH-3);
+        apple->yGrid = randr(3, HEIGHT-2);
+
+        /* Check if location doesn't overlap with the snake */
+        int ok = 1;
+        Body* current = player->head;
+
+        while(current != NULL)
+        {
+            if ((apple->xGrid == current->xGrid) &&
+                (apple->yGrid == current->yGrid))
+            {
+                ok = 0;
+                break;
+            }
+
+            current = current->next;
+        }
+
+        if (ok) return;
+    }
+}
+
 void InitGame(GameState* game)
 {
     game->gameOver = 0;
     game->asw = 3;
     game->ok = 0;
+    game->state = GAME;
 
     strcpy(game->text, "---");
     game->inputLength = 0;
 
+    game->running = SDL_TRUE;
+}
+
+void ResetGame(GameState* game)
+{
     DeleteSnake(game->player.head);
-
+    InitGame(game);
     InitPlayer(&game->player);
-
-    game->apple.xGrid = 4;
-    game->apple.yGrid = 10;
+    GetRandomApplePos(&game->player, &game->apple);
 }
 
 
@@ -369,15 +401,6 @@ void ShiftPlace(GameState* game, int place)
     }
 }
 
-
-unsigned int randr(unsigned int min, unsigned int max)
-{
-    double scaled = (double)rand()/RAND_MAX;
-
-    return (max - min +1)*scaled + min;
-}
-
-
 void SnakeAppleCollision(Player* player, Apple* apple)
 {
     if ((player->head->xGrid == apple->xGrid) &&
@@ -386,30 +409,7 @@ void SnakeAppleCollision(Player* player, Apple* apple)
         if (player->score < (WIDTH*HEIGHT*10)-(INITIAL_SIZE+1)*10)
                 player->score += 10;
 
-        while (1)
-        {
-            // Change apple location
-            apple->xGrid = randr(2, WIDTH-3);
-            apple->yGrid = randr(3, HEIGHT-2);
-
-            /* Check if location doesn't overlap with the snake */
-            int ok = 1;
-            Body* current = player->head;
-
-            while(current != NULL)
-            {
-                if ((apple->xGrid == current->xGrid) &&
-                    (apple->yGrid == current->yGrid))
-                {
-                    ok = 0;
-                    break;
-                }
-
-                current = current->next;
-            }
-
-            if (ok) break;
-        }
+        GetRandomApplePos(player, apple);
 
         // Add body parts
         player->parts++;

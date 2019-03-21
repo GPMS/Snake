@@ -219,8 +219,7 @@ void DrawNewHighscore(GameState* game)
     if (game->ok == 1)
     {
         strcpy(game->highScores[game->player.pos].name, game->text);
-        InitGame(game);
-        game->state = GAME;
+        ResetGame(game);
     }
     else if (game->ok == 3)
     {
@@ -311,8 +310,7 @@ void DrawGameOverScreen(GameState* game)
             break;
         case 1:
             game->gameOver = 0;
-            InitGame(game);
-            game->state = GAME;
+            ResetGame(game);
             break;
     }
 }
