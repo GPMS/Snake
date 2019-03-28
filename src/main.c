@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
     DeleteSnake(game.player.head);
 
     TTF_CloseFont(game.font);
+    TTF_Quit();
 
     SDL_DestroyWindow(game.window);
     SDL_DestroyRenderer(game.renderer);
