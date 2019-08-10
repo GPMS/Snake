@@ -1,12 +1,11 @@
-CC=gcc
-CFLAGS=-Wall
+CC = gcc
+FLAGS = -std=c11 -g -Wall -pedantic -O3
+INCLUDES = -lSDL2 -lSDL2_ttf
+SRC = src/*.c
+EXEC = game
 
-FILES=./src/*.c 
-
-LIBS=-lSDL2 -lSDL2_ttf
-
-all:
-	gcc -g -o game $(FILES) $(CFLAGS) $(LIBS)
+make:
+	$(CC) -o $(EXEC) $(FLAGS) $(INCLUDES) $(SRC)
 
 clean:
-	rm game
+	rm $(EXEC)

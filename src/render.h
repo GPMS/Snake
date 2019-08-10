@@ -1,5 +1,12 @@
 #pragma once
 
-#include "main.h"
+#include <SDL2/SDL.h>
+#include "game.h"
 
-void Render(GameState* game);
+extern const SDL_Color white;
+extern const SDL_Color black;
+extern const SDL_Color red;
+extern const SDL_Color green;
+extern const SDL_Color blue;
+
+void Render(Game* game);

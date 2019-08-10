@@ -1,109 +1,125 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <string.h>
 
 #include "render.h"
 
 #define CENTERED -1
 
-// Colors
-//                             R    G    B    A
-SDL_Color white         =   { 255, 255, 255, 255 };
-SDL_Color lightGrey     =   { 192, 192, 192, 255 };
-SDL_Color grey          =   {  50,  50,  50, 255 };
-SDL_Color black         =   {   0,   0,   0, 255 };
-SDL_Color red           =   { 255,   0,   0, 255 };
-SDL_Color green         =   {   0, 255,   0, 255 };
-SDL_Color blue          =   {   0,   0, 255, 255 };
-SDL_Color lightPink     =   { 255, 153, 153, 255 };
-SDL_Color orange        =   { 255, 128,   0, 255 };
-SDL_Color lightOrange   =   { 255, 178, 102, 255 };
-SDL_Color lightBlue     =   {  51, 255, 255, 255 };
-SDL_Color yellow        =   { 255, 255,   0, 255 };
 
-void SetRenderColor(SDL_Renderer* renderer,
-                    SDL_Color color)
+//          Palette
+//                          R    G    B    A
+const SDL_Color white   = {255, 255, 255, 255};
+const SDL_Color black   = {  0,   0,   0, 255};
+const SDL_Color red     = {255,   0,   0, 255};
+const SDL_Color green   = {  0, 255,   0, 255};
+const SDL_Color blue    = {  0,   0, 255, 255};
+const SDL_Color lightGrey     =   { 192, 192, 192, 255 };
+const SDL_Color grey          =   {  50,  50,  50, 255 };
+const SDL_Color lightPink     =   { 255, 153, 153, 255 };
+const SDL_Color orange        =   { 255, 128,   0, 255 };
+const SDL_Color lightOrange   =   { 255, 178, 102, 255 };
+const SDL_Color lightBlue     =   {  51, 255, 255, 255 };
+const SDL_Color yellow        =   { 255, 255,   0, 255 };
+
+/**
+ * @brief Use a color from the palette to set the draw color
+ *
+ * @param renderer  SDL renderer
+ * @param color     Color from the palette
+ */
+void SetRenderDrawColor(SDL_Renderer* renderer,
+                        const SDL_Color* color)
 {
-    SDL_SetRenderDrawColor(renderer,
-                           color.r, color.g, color.b, color.a);
+    SDL_SetRenderDrawColor(renderer, color->r,
+                                     color->g,
+                                     color->b,
+                                     color->a);
 }
 
-void DrawText(int inputX, int inputY,
-              const char* text, TTF_Font* font, SDL_Color color,
-              SDL_Renderer* renderer)
+/**
+ * @brief Given a font, draw text on screen
+ *
+ * @param game      The game struct
+ * @param x         Text x coordinate (can set to CENTERED)
+ * @param y         Text y coordinate (can set to CENTERED)
+ * @param text      Text string
+ * @param font      Game font
+ * @param color     Text color
+ * @param renderer  SDL renderer
+ */
+void DrawText(const Game* game,
+              int x, int y,
+              const char* text,
+              TTF_Font* font, const SDL_Color* color)
 {
-    SDL_Texture* label = NULL;
     SDL_Surface* tmpSurface = NULL;
-    int x, y;
+    tmpSurface = TTF_RenderText_Blended(font, text, *color);
 
-    tmpSurface = TTF_RenderText_Blended(font, text, color);
-    label = SDL_CreateTextureFromSurface(renderer, tmpSurface);
+    // create texture from surface and place it on the screen
+    SDL_Texture* label = NULL;
+    label = SDL_CreateTextureFromSurface(game->renderer, tmpSurface);
 
-    if (inputX == CENTERED) x = (WIDTH*BLOCK_SIZE - tmpSurface->w)/2;
-    else                    x = inputX;
-
-    if (inputY == CENTERED) y = (HEIGHT*BLOCK_SIZE - tmpSurface->h)/2;
-    else                    y = inputY;
+    if (x == CENTERED) x = (game->width * game->blockSize - tmpSurface->w)/2;
+    if (y == CENTERED) y = (game->height * game->blockSize - tmpSurface->h)/2;
 
     SDL_Rect textRect = {x, y, tmpSurface->w, tmpSurface->h};
-
-    SDL_RenderCopy(renderer, label, NULL, &textRect);
     SDL_FreeSurface(tmpSurface);
+
+    SDL_RenderCopy(game->renderer, label, NULL, &textRect);
 }
 
-void DrawGameScreen(const GameState* game)
+void DrawGameScreen(const Game* game)
 {
     SDL_Renderer* renderer = game->renderer;
 
     /* Draw black background */
-    SetRenderColor(renderer, black);
+    SetRenderDrawColor(renderer, &black);
     SDL_RenderClear(renderer);
 
     /* Draw score */
     char str[128] = "";
 
     sprintf(str, "score:%d", game->player.score);
-    DrawText(2 * BLOCK_SIZE, BLOCK_SIZE,
-             str, game->font, white,
-             renderer);
+    DrawText(game,
+             2 * game->blockSize, game->blockSize,
+             str, game->font, &white);
 
     sprintf(str, "highest:%d", game->highScores[0].value);
-    DrawText((WIDTH - 13) * BLOCK_SIZE, BLOCK_SIZE,
-             str, game->font, white,
-             renderer);
+    DrawText(game,
+             (game->width - 13) * game->blockSize, game->blockSize,
+             str, game->font, &white);
 
     /* Draw main screen */
-    SetRenderColor(renderer, grey);
+    SetRenderDrawColor(renderer, &grey);
 
     SDL_Rect mainScreen = {
-        2*BLOCK_SIZE, 3*BLOCK_SIZE,
-        22*BLOCK_SIZE, 22*BLOCK_SIZE
+        2*game->blockSize, 3*game->blockSize,
+        22*game->blockSize, 22*game->blockSize
     };
 
     SDL_RenderFillRect(renderer, &mainScreen);
 
     /* Draw apple */
-    SetRenderColor(renderer, red);
+    SetRenderDrawColor(renderer, &red);
 
     SDL_Rect appleRect;
-    appleRect.x = game->apple.xGrid * BLOCK_SIZE;
-    appleRect.y = game->apple.yGrid * BLOCK_SIZE;
-    appleRect.w = appleRect.h = BLOCK_SIZE - 5;
+    appleRect.x = game->apple.xGrid * game->blockSize;
+    appleRect.y = game->apple.yGrid * game->blockSize;
+    appleRect.w = appleRect.h = game->blockSize - 5;
 
     SDL_RenderFillRect(renderer, &appleRect);
 
     /* Draw snake */
-    SetRenderColor(renderer, green);
+    SetRenderDrawColor(renderer, &green);
 
     SDL_Rect snakeRect;
-    snakeRect.w = snakeRect.h = BLOCK_SIZE - 5;
+    snakeRect.w = snakeRect.h = game->blockSize - 5;
 
     Body* current = game->player.head;
 
     while (current != NULL)
     {
-        snakeRect.x = current->xGrid*BLOCK_SIZE;
-        snakeRect.y = current->yGrid*BLOCK_SIZE;
+        snakeRect.x = current->xGrid*game->blockSize;
+        snakeRect.y = current->yGrid*game->blockSize;
 
         SDL_RenderFillRect(renderer, &snakeRect);
 
@@ -112,51 +128,49 @@ void DrawGameScreen(const GameState* game)
 }
 
 
-void DrawPauseScreen(const GameState* game)
+void DrawPauseScreen(const Game* game)
 {
     SDL_Renderer* renderer = game->renderer;
 
     /* Clear playground */
-    SetRenderColor(renderer, black);
+    SetRenderDrawColor(renderer, &black);
     SDL_RenderClear(renderer);
 
     /* Draw score */
     char str[128] = "";
     sprintf(str, "score:%d", game->player.score);
 
-    DrawText(BLOCK_SIZE, BLOCK_SIZE,
-             str, game->font, white,
-             renderer);
+    DrawText(game,
+             game->blockSize, game->blockSize,
+             str, game->font, &white);
 
     /* Draw main screen */
-    SetRenderColor(renderer, grey);
+    SetRenderDrawColor(renderer, &grey);
 
     SDL_Rect mainScreen;
-    mainScreen.x = 2*BLOCK_SIZE;
-    mainScreen.y = 3*BLOCK_SIZE;
-    mainScreen.w = mainScreen.h = 22*BLOCK_SIZE;
+    mainScreen.x = 2*game->blockSize;
+    mainScreen.y = 3*game->blockSize;
+    mainScreen.w = mainScreen.h = 22*game->blockSize;
 
     SDL_RenderFillRect(renderer, &mainScreen);
 
     /* Draw pause */
-    DrawText(CENTERED, 5 * BLOCK_SIZE,
-             "PAUSED", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 5 * game->blockSize,
+             "PAUSED", game->font, &white);
 
     // Draw instructions
-    DrawText(CENTERED, CENTERED,
-             "Press p to continue", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, CENTERED,
+             "Press p to continue", game->font, &white);
 }
 
 
-void DrawNewHighscore(GameState* game)
+void DrawNewHighscore(Game* game)
 {
-    SDL_Renderer* renderer = game->renderer;
-
-    DrawText(CENTERED, 15 * BLOCK_SIZE,
-             "New Highscore!", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 15 * game->blockSize,
+             "New Highscore!", game->font, &white);
 
     /* Show place and score */
     char place[4];
@@ -201,18 +215,18 @@ void DrawNewHighscore(GameState* game)
     char str[128] = "";
     sprintf(str, "%s place", place);
 
-    DrawText(CENTERED, 16 * BLOCK_SIZE,
-             str, game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 16 * game->blockSize,
+             str, game->font, &white);
 
     /* Prompt */
-    DrawText(CENTERED, 17 * BLOCK_SIZE,
-             "Input your name", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 17 * game->blockSize,
+             "Input your name", game->font, &white);
 
-    DrawText(CENTERED, 18 * BLOCK_SIZE,
-             game->text, game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 18 * game->blockSize,
+             game->text, game->font, &white);
 
     game->player.pos = placeNum - 1;
 
@@ -223,16 +237,15 @@ void DrawNewHighscore(GameState* game)
     }
     else if (game->ok == 3)
     {
-        DrawText(CENTERED, 19 * BLOCK_SIZE,
-                 "At least 3 characters", game->font, white,
-                 renderer);
+        DrawText(game,
+                 CENTERED, 19 * game->blockSize,
+                 "At least 3 characters", game->font, &white);
     }
 }
 
 
-void DrawPlaces(const GameState* game, int curPlace)
+void DrawPlaces(const Game* game, int curPlace)
 {
-    SDL_Renderer* renderer = game->renderer;
     char str[128] = "";
 
     SDL_Color colours[5] = {lightGrey,
@@ -248,27 +261,27 @@ void DrawPlaces(const GameState* game, int curPlace)
             game->highScores[curPlace].value,
             game->highScores[curPlace].name);
 
-    DrawText(CENTERED, (5 + curPlace) * BLOCK_SIZE,
-             str, game->font, colours[curPlace],
-             renderer);
+    DrawText(game,
+             CENTERED, (5 + curPlace) * game->blockSize,
+             str, game->font, &colours[curPlace]);
 
     DrawPlaces(game, ++curPlace);
 }
 
 
-void DrawHighscoreScreen(GameState* game)
+void DrawHighscoreScreen(Game* game)
 {
     SDL_Renderer* renderer = game->renderer;
 
-    SetRenderColor(renderer, black);
+    SetRenderDrawColor(renderer, &black);
     SDL_RenderClear(renderer);
 
-    DrawText(CENTERED, 2 * BLOCK_SIZE,
-             "Highscore Board", game->font, lightBlue,
-             renderer);
-    DrawText(CENTERED, 4 * BLOCK_SIZE,
-             "Place\tScore\tName", game->font, yellow,
-             renderer);
+    DrawText(game,
+             CENTERED, 2 * game->blockSize,
+             "Highscore Board", game->font, &lightBlue);
+    DrawText(game,
+             CENTERED, 4 * game->blockSize,
+             "Place\tScore\tName", game->font, &yellow);
 
     DrawPlaces(game, 0);
 
@@ -276,37 +289,37 @@ void DrawHighscoreScreen(GameState* game)
 }
 
 
-void DrawGameOverScreen(GameState* game)
+void DrawGameOverScreen(Game* game)
 {
     SDL_Renderer* renderer = game->renderer;
 
     /* Draw black background */
-    SetRenderColor(renderer, black);
+    SetRenderDrawColor(renderer, &black);
     SDL_RenderClear(renderer);
 
     /* Write gameover */
-    DrawText(CENTERED, 5 * BLOCK_SIZE,
-             "GameOver", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 5 * game->blockSize,
+             "GameOver", game->font, &white);
 
     char str[128];
 
     sprintf(str, "Score: %d", game->player.score);
 
-    DrawText(CENTERED, 7 * BLOCK_SIZE,
-             str, game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, 7 * game->blockSize,
+             str, game->font, &white);
 
     /* Continue? */
     game->gameOver = 1;
-    DrawText(CENTERED, CENTERED,
-             "Continue? (Y/N)", game->font, white,
-             renderer);
+    DrawText(game,
+             CENTERED, CENTERED,
+             "Continue? (Y/N)", game->font, &white);
 
     switch(game->asw)
     {
         case 0:
-            game->running = SDL_FALSE;
+            game->isRunning = SDL_FALSE;
             break;
         case 1:
             game->gameOver = 0;
@@ -316,7 +329,7 @@ void DrawGameOverScreen(GameState* game)
 }
 
 
-void Render(GameState* game)
+void Render(Game* game)
 {
     switch(game->state)
     {
