@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "game.h"
+#include "Engine/game.h"
 #include "render.h"
 
 
@@ -15,9 +15,9 @@
  */
 int main(int argc, char* argv[])
 {
-    Game* game = CreateGame("Game", 26, 26);
-    GameLoop(game);
-    DestroyGame(game);
+    Game* game = Game_Create("Game", 26, 26);
+    Game_Loop(game);
+    Game_Destroy(game);
 
     return 0;
 }

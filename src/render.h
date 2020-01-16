@@ -1,12 +1,11 @@
 #pragma once
 
-#include <SDL2/SDL.h>
-#include "game.h"
+#include "Engine/game.h"
 
-extern const SDL_Color white;
-extern const SDL_Color black;
-extern const SDL_Color red;
-extern const SDL_Color green;
-extern const SDL_Color blue;
 
+/**
+ * Draws The game
+ *
+ * @param game The game struct
+ */
 void Render(Game* game);

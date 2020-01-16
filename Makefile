@@ -1,11 +1,8 @@
-CC = gcc
-FLAGS = -std=c11 -g -Wall -pedantic -O3
-INCLUDES = -lSDL2 -lSDL2_ttf
-SRC = src/*.c
-EXEC = game
+CC= gcc
+FLAGS= -g -Wall
+LIBS= -lSDL2 -lSDL2_image -lSDL2_ttf
+SRC= src/*.c src/Engine/*.c
+OUTPUT= game
 
 make:
-	$(CC) -o $(EXEC) $(FLAGS) $(INCLUDES) $(SRC)
-
-clean:
-	rm $(EXEC)
+	$(CC) -o $(OUTPUT) $(FLAGS) $(LIBS) $(SRC)
