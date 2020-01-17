@@ -8,6 +8,20 @@ typedef struct Apple {
 #include "Engine/game.h"
 
 /**
+ * @brief Gets called at the beginning of the game
+ *
+ * @param game  Game struct
+ */
+void Game_OnStart(Game* game);
+
+/**
+ * @brief Gets called once the game finishes
+ *
+ * @param game  Game struct
+ */
+void Game_OnFinish(Game* game);
+
+/**
  * @brief Updates game logic
  *
  * @param game  Game struct

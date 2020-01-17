@@ -50,8 +50,6 @@ void LoadResources(Game* game)
 {
     game->numFonts = 1;
     game->fonts[0] = LoadFont("resources/font.ttf", 24);
-
-    Highscore_Load(game);
 }
 
 Game* Game_Create(const char* title,
@@ -93,14 +91,14 @@ Game* Game_Create(const char* title,
 
     LoadResources(game);
 
-    Game_Reset(game);
+    Game_OnStart(game);
 
     return game;
 }
 
 void Game_Destroy(Game* game)
 {
-    Highscore_Save(game);
+    Game_OnFinish(game);
 
     for (int i = 0; i < game->numFonts; i++)
         TTF_CloseFont(game->fonts[i]);

@@ -1,5 +1,73 @@
 #include "logic.h"
 
+
+unsigned int RangedRandom(unsigned int min, unsigned int max)
+{
+    double scaled = (double)rand()/RAND_MAX;
+
+    return (max - min +1)*scaled + min;
+}
+
+void GetRandomApplePos(Game* game)
+{
+    Player* player = &game->player;
+    Apple* apple = &game->apple;
+
+    while (1)
+    {
+        // Change apple location
+        apple->xGrid = RangedRandom(2, game->width-3);
+        apple->yGrid = RangedRandom(3, game->height-2);
+
+        // Check if location doesn't overlap with the snake
+        SDL_bool isOverlapping = SDL_FALSE;
+        Body* current = player->head;
+
+        while(current != NULL)
+        {
+            if ((apple->xGrid == current->xGrid) &&
+                (apple->yGrid == current->yGrid))
+            {
+                isOverlapping = SDL_TRUE;
+                break;
+            }
+
+            current = current->next;
+        }
+
+        if (!isOverlapping) return;
+    }
+}
+
+void Game_Reset(Game* game)
+{
+    game->state = GAME;
+
+    game->input.asw = -1;
+    strcpy(game->input.text, "---");
+    game->input.textLength = 0;
+    game->input.isTooShort = SDL_FALSE;
+
+    game->isRunning = SDL_TRUE;
+
+    game->player.initialSize = 4;
+    Player_Destroy(&game->player);
+    Player_Reset(&game->player);
+
+    GetRandomApplePos(game);
+}
+
+void Game_OnStart(Game* game)
+{
+    Highscore_Load(game);
+    Game_Reset(game);
+}
+
+void Game_OnFinish(Game* game)
+{
+    Highscore_Save(game);
+}
+
 void HandleInput(Game* game)
 {
     Input* input = &game->input;
@@ -62,45 +130,6 @@ void HandleInput(Game* game)
             break;
         default:
             break;
-    }
-}
-
-unsigned int RangedRandom(unsigned int min, unsigned int max)
-{
-    double scaled = (double)rand()/RAND_MAX;
-
-    return (max - min +1)*scaled + min;
-}
-
-
-void GetRandomApplePos(Game* game)
-{
-    Player* player = &game->player;
-    Apple* apple = &game->apple;
-
-    while (1)
-    {
-        // Change apple location
-        apple->xGrid = RangedRandom(2, game->width-3);
-        apple->yGrid = RangedRandom(3, game->height-2);
-
-        // Check if location doesn't overlap with the snake
-        SDL_bool isOverlapping = SDL_FALSE;
-        Body* current = player->head;
-
-        while(current != NULL)
-        {
-            if ((apple->xGrid == current->xGrid) &&
-                (apple->yGrid == current->yGrid))
-            {
-                isOverlapping = SDL_TRUE;
-                break;
-            }
-
-            current = current->next;
-        }
-
-        if (!isOverlapping) return;
     }
 }
 
@@ -185,24 +214,6 @@ void CollisionCheck(Game* game)
     PlayerAppleCollision(game);
     PlayerPlayerCollision(game);
     PlayerWallCollision(game);
-}
-
-void Game_Reset(Game* game)
-{
-    game->state = GAME;
-
-    game->input.asw = -1;
-    strcpy(game->input.text, "---");
-    game->input.textLength = 0;
-    game->input.isTooShort = SDL_FALSE;
-
-    game->isRunning = SDL_TRUE;
-
-    game->player.initialSize = 4;
-    Player_Destroy(&game->player);
-    Player_Reset(&game->player);
-
-    GetRandomApplePos(game);
 }
 
 void Logic(Game* game)
