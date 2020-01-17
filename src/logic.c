@@ -224,6 +224,13 @@ void Logic(Game* game)
     {
         while (game->player.partsDrawn < game->player.parts)
         {
+            // Dont spawn a body part outside of the playing area
+            if (game->player.tail->pastXGrid == 0 &&
+                game->player.tail->pastYGrid == 0)
+            {
+                break;
+            }
+
             game->player.tail = Player_AddBody(game->player.tail);
             game->player.partsDrawn++;
         }

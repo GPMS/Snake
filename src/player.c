@@ -22,8 +22,8 @@ Body* Player_AddBody(Body *tail)
     tail->next = newBody;
 
     newBody->next = NULL;
-    newBody->xGrid = tail-> pastXGrid;
-    newBody->yGrid = tail-> pastYGrid;
+    newBody->xGrid = tail->pastXGrid;
+    newBody->yGrid = tail->pastYGrid;
 
     return newBody;
 }
