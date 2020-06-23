@@ -1,11 +1,16 @@
-#pragma once
+#ifndef RENDER_H
+#define RENDER_H
 
-#include "Engine/game.h"
+#include <SDL2/SDL.h>
+
+struct Game;
 
 
-/**
- * Draws The game
- *
- * @param game The game struct
- */
-void Render(Game* game);
+// Draws the game
+void Render(struct Game* game);
+
+void SetDrawColor(SDL_Renderer* renderer,
+                  const SDL_Color* color);
+
+#endif
+

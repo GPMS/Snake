@@ -1,4 +1,4 @@
-#include "Engine/game.h"
+#include "game.h"
 
 #include <stdio.h>
 
@@ -35,24 +35,22 @@ void ShiftPlace(Game* game, int place)
 
 void Highscore_New(Game* game)
 {
-    Player* player = &game->player;
-
     for (int i = 4; i > -1; i--)
     {
-        if (player->score < game->highScores[i].value)
+        if (game->score < game->highScores[i].value)
         {
             ShiftPlace(game, i+1);
 
             strcpy( game->highScores[i+1].name, "---");
-            game->highScores[i+1].value = player->score;
+            game->highScores[i+1].value = game->score;
             break;
         }
-        else if (player->score == game->highScores[i].value)
+        else if (game->score == game->highScores[i].value)
         {
             ShiftPlace(game, i);
 
             strcpy( game->highScores[i].name, "---");
-            game->highScores[i].value = player->score;
+            game->highScores[i].value = game->score;
             break;
         }
         else if (i == 0)
@@ -60,11 +58,11 @@ void Highscore_New(Game* game)
             ShiftPlace(game, 0);
 
             strcpy( game->highScores[0].name, "---");
-            game->highScores[0].value = player->score;
+            game->highScores[0].value = game->score;
         }
     }
 
-    game->state = HIGHSCORE;
+    game->state = NEW_HIGHSCORE;
 }
 
 void Highscore_Load(Game* game)
