@@ -2,11 +2,10 @@
 
 #include "game.h"
 #include "input.h"
-#include "render.h"
 #include "highscore.h"
 
+#include "Engine/draw.h"
 #include "Engine/window.h"
-#include "Engine/pallete.h"
 
 #include <stdlib.h>
 
@@ -283,19 +282,16 @@ void Snake_Update(Game* game)
 void Snake_Draw(const Game* game)
 {
     SDL_Renderer* renderer = game->window->SDLRenderer;
-    SetDrawColor(renderer, &green);
 
-    SDL_Rect bodyRect;
-    bodyRect.w = bodyRect.h = BLOCK_SIZE - 5;
+    int size = BLOCK_SIZE - 5;
 
     Body* current = game->snake.head;
 
     while (current != NULL)
     {
-        bodyRect.x = current->pos.x * BLOCK_SIZE;
-        bodyRect.y = current->pos.y * BLOCK_SIZE;
-
-        SDL_RenderFillRect(renderer, &bodyRect);
+        DrawFillSquare(renderer, &green,
+                       Vector2_Mul(current->pos, BLOCK_SIZE),
+                       size);
 
         current = current->next;
     }
