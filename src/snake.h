@@ -24,5 +24,6 @@ typedef struct Snake {
 void Snake_Reset(struct Game* game);
 Body* Snake_AddBody(Body *tail);
 void Snake_Destroy(Snake *snake);
+void Snake_HandleInput(struct Game* game);
 void Snake_Update(struct Game* game);
 void Snake_Draw(const struct Game* game);

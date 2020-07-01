@@ -10,7 +10,6 @@
 #include <SDL2/SDL_ttf.h>
 
 struct Window;
-struct Input;
 
 enum GameState {
     PLAY,
@@ -31,26 +30,27 @@ typedef struct Game {
     Uint32          dt;
     enum GameState  state;
 
-    // Subsystems
-    struct Input*   input;
+    // Input
+    char            text[4];
+    int             textLength;
 
     // Font files
     TTF_Font*       font;
 
     // Game Logic
-    int rows, cols;
+    int             rows, cols;
 
-    int option;
-    SDL_bool isInputTooShort;
+    int             option;
+    SDL_bool        isInputTooShort;
 
-    Vec2 applePos;
+    Vec2            applePos;
 
-    Snake snake;
-    int initialSize;
+    Snake           snake;
+    int             initialSize;
 
-    int score;
-    int pos;
-    Score highScores[5];
+    int             score;
+    int             pos;
+    Score           highScores[5];
 } Game;
 
 void Game_Reset(Game* game);

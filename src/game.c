@@ -1,6 +1,6 @@
 #include "game.h"
 #include "Engine/window.h"
-#include "Engine/input.h"
+#include "input.h"
 #include "render.h"
 #include <stdio.h>
 
@@ -50,8 +50,8 @@ void Game_Reset(Game* game)
     game->state = PLAY;
 
     game->option = -1;
-    strcpy(game->input->text, "---");
-    game->input->textLength = 0;
+    strcpy(game->text, "???");
+    game->textLength = 0;
     game->isInputTooShort = SDL_FALSE;
 
     game->isRunning = SDL_TRUE;
@@ -73,8 +73,6 @@ void Game_Init(Game* game)
                                  game->rows * BLOCK_SIZE,
                                  0);
 
-    game->input = Input_Create();
-
     game->state = PLAY;
     game->isRunning = SDL_TRUE;
 
@@ -87,8 +85,6 @@ void Game_Init(Game* game)
 void Game_Quit(Game* game)
 {
     Highscore_Save(game);
-
-    Input_Destroy(game->input);
 
     TTF_CloseFont(game->font);
     TTF_Quit();
@@ -131,54 +127,12 @@ void CalculateFPS(Game* game, const unsigned int targetFPS)
 
 }
 
-// Deals with SDL events
-void ProcessInput(Game* game)
-{
-    Input* input = game->input;
-
-    game->isRunning = Input_Get(input);
-}
-
 void Update(Game* game)
 {
-    Input* input = game->input;
-
-    if (Input_KeyWasReleased(input, SDLK_ESCAPE))
-        game->isRunning = SDL_FALSE;
-
-    // Pause/Unpause the game
-    if (Input_KeyWasPressed(input, SDLK_p))
-    {
-        if (game->state == PLAY) game->state = PAUSE;
-        else if (game->state == PAUSE) game->state = PLAY;
-    }
-
     if (game->state == PLAY)
     {
         Snake_Update(game);
     }
-
-    if (game->state == GAMEOVER)
-    {
-        if (Input_KeyWasPressed(input, SDLK_y)) game->option = 1;
-        if (Input_KeyWasPressed(input, SDLK_n)) game->option = 0;
-    }
-
-    if (game->state == NEW_HIGHSCORE)
-    {
-        if (Input_KeyWasPressed(input, SDLK_BACKSPACE))
-        {
-            if (input->textLength > 0)
-                input->text[--input->textLength] = '?';
-        }
-        if (Input_KeyWasPressed(input, SDLK_RETURN))
-        {
-            if (input->textLength < 3)
-                game->isInputTooShort = SDL_TRUE;
-            game->option = 1;
-        }
-    }
-
 }
 
 void Game_Loop(Game* game)
@@ -187,7 +141,7 @@ void Game_Loop(Game* game)
     {
         CalculateFPS(game, 30);
 
-        ProcessInput(game);
+        Input_Process(game);
         Update(game);
         Render(game);
 

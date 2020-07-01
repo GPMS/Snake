@@ -1,11 +1,11 @@
 #include "snake.h"
 
 #include "game.h"
+#include "input.h"
 #include "render.h"
 #include "highscore.h"
 
 #include "Engine/window.h"
-#include "Engine/input.h"
 #include "Engine/pallete.h"
 
 #include <stdlib.h>
@@ -93,6 +93,32 @@ void Snake_Destroy(Snake *snake)
         holdMe = freeMe->next;
         free(freeMe);
         freeMe = holdMe;
+    }
+}
+
+void Snake_HandleInput(Game* game)
+{
+    Snake* snake = &game->snake;
+
+    if (KeyRelease(SDLK_UP))
+    {
+        if (snake->parts == 1 || snake->direction != SOUTH)
+            snake->direction = NORTH;
+    }
+    else if (KeyRelease(SDLK_DOWN))
+    {
+        if (snake->parts == 1 || snake->direction != NORTH)
+            snake->direction = SOUTH;
+    }
+    else if (KeyRelease(SDLK_LEFT))
+    {
+        if (snake->parts == 1 || snake->direction != EAST)
+            snake->direction = WEST;
+    }
+    else if (KeyRelease(SDLK_RIGHT))
+    {
+        if (snake->parts == 1 || snake->direction != WEST)
+            snake->direction = EAST;
     }
 }
 
@@ -227,28 +253,6 @@ void Move(Game* game)
 void Snake_Update(Game* game)
 {
     Snake* snake = &game->snake;
-
-    Input* input = game->input;
-    if (Input_KeyWasPressed(input, SDLK_UP))
-    {
-        if (snake->parts == 1 || snake->direction != SOUTH)
-            snake->direction = NORTH;
-    }
-    else if (Input_KeyWasPressed(input, SDLK_DOWN))
-    {
-        if (snake->parts == 1 || snake->direction != NORTH)
-            snake->direction = SOUTH;
-    }
-    else if (Input_KeyWasPressed(input, SDLK_LEFT))
-    {
-        if (snake->parts == 1 || snake->direction != EAST)
-            snake->direction = WEST;
-    }
-    else if (Input_KeyWasPressed(input, SDLK_RIGHT))
-    {
-        if (snake->parts == 1 || snake->direction != WEST)
-            snake->direction = EAST;
-    }
 
     while (snake->partsDrawn < snake->parts)
     {

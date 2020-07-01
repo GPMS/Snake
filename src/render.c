@@ -1,7 +1,6 @@
 #include "Engine/pallete.h"
 #include "Engine/window.h"
 #include "Engine/vector.h"
-#include "Engine/input.h"
 
 #include "game.h"
 
@@ -277,7 +276,7 @@ void DrawNewHighscore(Game* game)
 
     DrawText(game, &white,
              Vector2(CENTERED, 18 * BLOCK_SIZE),
-             game->input->text, game->font);
+             game->text, game->font);
 
     game->pos = placeNum - 1;
 
@@ -292,7 +291,7 @@ void DrawNewHighscore(Game* game)
         }
 
         strcpy(game->highScores[game->pos].name,
-               game->input->text);
+               game->text);
         Game_Reset(game);
     }
 }
