@@ -1,5 +1,6 @@
 #include "draw.h"
 #include "window.h"
+#include <SDL2/SDL_render.h>
 
 //                                 R    G    B    A
 const SDL_Color white       =   { 255, 255, 255, 255 };
@@ -64,6 +65,7 @@ void DrawText(Window* window,
         position.y = (window->height - height)/2.0f;
 
     CopyTexture(renderer, label, position, width, height);
+    SDL_DestroyTexture(label);
 }
 
 void DrawFillRect(SDL_Renderer* renderer,
