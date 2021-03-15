@@ -93,6 +93,13 @@ Vec2 Vector2_Rotate(Vec2 v, float radians)
     return new;
 }
 
+int Vector2_Compare(Vec2 a, Vec2 b)
+{
+    if (a.x == b.x && a.y == b.y)
+        return 0;
+    return 1;
+}
+
 float Lerp(float start, float end, float percent)
 {
     return start + (end - start) * percent;

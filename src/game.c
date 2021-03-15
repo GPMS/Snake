@@ -56,6 +56,7 @@ void Game_Reset(Game* game)
 
     game->score       = 0;
     game->initialSize = 4;
+
     Snake_Destroy(&game->snake);
     Snake_Reset(game);
 }

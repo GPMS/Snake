@@ -17,6 +17,8 @@ float Vector2_Dot(Vec2 a, Vec2 b);
 float Vector2_Mag(Vec2 v);
 Vec2  Vector2_Norm(Vec2 v);
 
+int Vector2_Compare(Vec2 a, Vec2 b);
+
 float DegreesToRadians(float degrees);
 Vec2  Vector2_Rotate(Vec2 v, float radians);
 

@@ -32,17 +32,13 @@ void GetRandomApplePos(Game* game)
 
         // Check if location doesn't overlap with the snake
         SDL_bool isOverlapping = SDL_FALSE;
-        Body*    current       = snake->head;
 
-        while (current != NULL) {
-            if ((apple->x == current->pos.x) && (apple->y == current->pos.y)) {
+        for (unsigned int i = 0; i < snake->partsDrawn; i++) {
+            if ((apple->x == snake->body[i].pos.x) && (apple->y == snake->body[i].pos.y)) {
                 isOverlapping = SDL_TRUE;
                 break;
             }
-
-            current = current->next;
         }
-
         if (!isOverlapping)
             return;
     }
@@ -52,41 +48,24 @@ void Snake_Reset(Game* game)
 {
     Snake* snake = &game->snake;
 
-    snake->head = calloc(1, sizeof(Body));
-    snake->tail = snake->head;
-
-    snake->head->pos  = Vector2(5, 10);
-    snake->head->next = NULL;
-
     snake->direction  = EAST;
     snake->parts      = game->initialSize;
     snake->partsDrawn = 1;
 
+    snake->bodyLength  = game->initialSize;
+    snake->body        = malloc(snake->bodyLength * sizeof(Body));
+    snake->body[0].pos = Vector2(5, 10);
+
     GetRandomApplePos(game);
-}
-
-Body* Snake_AddBody(Body* tail)
-{
-    Body* newBody = malloc(sizeof(Body));
-
-    tail->next = newBody;
-
-    newBody->next = NULL;
-    newBody->pos  = tail->pastPos;
-
-    return newBody;
 }
 
 void Snake_Destroy(Snake* snake)
 {
-    Body* freeMe = snake->head;
-    Body* holdMe = NULL;
+    free(snake->body);
 
-    while (freeMe != NULL) {
-        holdMe = freeMe->next;
-        free(freeMe);
-        freeMe = holdMe;
-    }
+    snake->bodyLength = 0;
+    snake->parts      = 0;
+    snake->partsDrawn = 0;
 }
 
 void Snake_HandleInput(Game* game)
@@ -133,9 +112,8 @@ void BodyCollision(Game* game)
 {
     Snake* snake = &game->snake;
 
-    Body* current = snake->head->next;
-    while (current != NULL) {
-        if ((snake->head->pos.x == current->pos.x) && (snake->head->pos.y == current->pos.y)) {
+    for (unsigned int i = 1; i < snake->partsDrawn; i++) {
+        if (Vector2_Compare(snake->body[0].pos, snake->body[i].pos) == 0) {
             if (game->score >= game->highScores[4].value) {
                 Highscore_New(game);
             } else {
@@ -143,13 +121,12 @@ void BodyCollision(Game* game)
                 break;
             }
         }
-        current = current->next;
     }
 }
 
 void WallCollision(Game* game)
 {
-    Body* head = game->snake.head;
+    Body* head = &game->snake.body[0];
 
     int maxRow = game->rows - 2;
     int minRow = 3;
@@ -190,51 +167,36 @@ void Move(Game* game)
     Snake* snake = &game->snake;
 
     // MOVE HEAD
-    snake->head->pastPos = snake->head->pos;
+    Body* head = &snake->body[0];
+
+    head->pastPos = head->pos;
     switch (snake->direction) {
         case NORTH:
-            snake->head->pos.y--;
+            head->pos.y--;
             break;
         case SOUTH:
-            snake->head->pos.y++;
+            head->pos.y++;
             break;
         case EAST:
-            snake->head->pos.x++;
+            head->pos.x++;
             break;
         case WEST:
-            snake->head->pos.x--;
+            head->pos.x--;
             break;
     }
-
-    // MOVE BODY
-    Body* current  = snake->head->next;
-    Body* previous = snake->head;
 
     // Loop through the body of the snake, update the past
     // position of the current part and move it to the
     // past position of the previous part
-    while (current != NULL) {
-        current->pastPos = current->pos;
-        current->pos     = previous->pastPos;
-
-        previous = current;
-        current  = current->next;
+    for (unsigned int i = 1; i < snake->partsDrawn; i++) {
+        snake->body[i].pastPos = snake->body[i].pos;
+        snake->body[i].pos     = snake->body[i - 1].pastPos;
     }
 }
 
 void Snake_Update(Game* game)
 {
     Snake* snake = &game->snake;
-
-    while (snake->partsDrawn < snake->parts) {
-        // Dont spawn a body part outside of the playing area
-        if (snake->tail->pos.x == 0 && snake->tail->pos.y == 0) {
-            break;
-        }
-
-        snake->tail = Snake_AddBody(snake->tail);
-        snake->partsDrawn++;
-    }
 
     // Move every moveSpeed miliseconds
     static int time = 0;
@@ -246,19 +208,31 @@ void Snake_Update(Game* game)
     }
 
     CollisionCheck(game);
+
+    while (snake->partsDrawn < snake->parts) {
+        if (snake->partsDrawn > snake->bodyLength - 1) {
+            snake->bodyLength *= 2;
+            snake->body = realloc(snake->body, snake->bodyLength * sizeof(Body));
+            printf("Realloc length = %d\n", snake->bodyLength);
+        }
+
+        snake->body[snake->partsDrawn].pos = snake->body[snake->partsDrawn - 1].pastPos;
+        snake->partsDrawn++;
+    }
 }
 
 void Snake_Draw(const Game* game)
 {
     SDL_Renderer* renderer = game->window->SDLRenderer;
+    const Snake*  snake    = &game->snake;
 
     int size = BLOCK_SIZE - 5;
 
-    Body* current = game->snake.head;
+    for (unsigned int i = 0; i < snake->partsDrawn; i++) {
+        // Don't draw blocks without defined position
+        if (snake->body[i].pos.x == 0)
+            break;
 
-    while (current != NULL) {
-        DrawFillSquare(renderer, &green, Vector2_Mul(current->pos, BLOCK_SIZE), size);
-
-        current = current->next;
+        DrawFillSquare(renderer, &green, Vector2_Mul(snake->body[i].pos, BLOCK_SIZE), size);
     }
 }

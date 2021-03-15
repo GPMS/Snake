@@ -10,15 +10,14 @@ enum dir { NORTH,
            SOUTH };
 
 typedef struct Body {
-    Vec2         pos;
-    Vec2         pastPos;
-    struct Body* next;
+    Vec2 pos;
+    Vec2 pastPos;
 } Body;
 
 typedef struct Snake {
-    Body* head;
-    Body* tail;
+    Body* body;
 
+    int bodyLength;
     int direction;
     int parts;
     int partsDrawn;
