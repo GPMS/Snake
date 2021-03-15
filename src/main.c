@@ -6,11 +6,9 @@
 // Entry point for the program
 int main(int argc, char* argv[])
 {
-    struct Game game;
-
-    Game_Init(&game);
-    Game_Loop(&game);
-    Game_Quit(&game);
+    Game* game = Game_Create(&game);
+    Game_Loop(game);
+    Game_Destroy(game);
 
     return 0;
 }

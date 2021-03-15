@@ -54,10 +54,10 @@ typedef struct Game {
 void Game_Reset(Game* game);
 
 // Sets up SDL and creates a window and a renderer, filling up
-void Game_Init(Game* game);
+Game* Game_Create();
 
 // Deallocates memory and quits SDL
-void Game_Quit(Game* game);
+void Game_Destroy(Game* game);
 
 // Game loop...
 void Game_Loop(Game* game);

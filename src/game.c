@@ -60,8 +60,10 @@ void Game_Reset(Game* game)
     Snake_Reset(game);
 }
 
-void Game_Init(Game* game)
+Game* Game_Create()
 {
+    Game* game = malloc(sizeof(Game));
+
     InitSDL();
 
     game->rows = game->cols = 26;
@@ -74,9 +76,11 @@ void Game_Init(Game* game)
     LoadResources(game);
     Game_Reset(game);
     Highscore_Load(game);
+
+    return game;
 }
 
-void Game_Quit(Game* game)
+void Game_Destroy(Game* game)
 {
     Highscore_Save(game);
 
@@ -84,6 +88,8 @@ void Game_Quit(Game* game)
     TTF_Quit();
 
     Window_Destroy(game->window);
+
+    free(game);
 
     QuitSDL();
 }
