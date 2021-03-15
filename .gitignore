@@ -1,4 +1,4 @@
-game
-saveData.bin
 .vscode/*
+build/
 tags
+
