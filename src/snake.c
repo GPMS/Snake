@@ -213,7 +213,9 @@ void Snake_Update(Game* game)
             printf("Realloc length = %d\n", snake->bodyLength);
         }
 
-        snake->body[snake->partsDrawn].pos = snake->body[snake->partsDrawn - 1].pastPos;
+        snake->body[snake->partsDrawn].pos     = snake->body[snake->partsDrawn - 1].pastPos;
+        snake->body[snake->partsDrawn].pastPos = Vector2(0, 0);
+
         snake->partsDrawn++;
     }
 }
