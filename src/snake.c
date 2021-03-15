@@ -1,12 +1,12 @@
 #include "snake.h"
 
+#include <stdlib.h>
+
 #include "draw.h"
 #include "game.h"
 #include "highscore.h"
 #include "input.h"
 #include "window.h"
-
-#include <stdlib.h>
 
 unsigned int RangedRandom(unsigned int min, unsigned int max)
 {

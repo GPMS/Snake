@@ -1,8 +1,8 @@
 #include "input.h"
 
-#include "game.h"
-
 #include <stdio.h>
+
+#include "game.h"
 
 static SDL_Event event;
 

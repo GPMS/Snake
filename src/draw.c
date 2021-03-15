@@ -1,6 +1,8 @@
 #include "draw.h"
-#include "window.h"
+
 #include <SDL2/SDL_render.h>
+
+#include "window.h"
 
 //                                 R    G    B    A
 const SDL_Color white       = {255, 255, 255, 255};

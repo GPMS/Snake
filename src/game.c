@@ -1,9 +1,10 @@
 #include "game.h"
 
+#include <stdio.h>
+
 #include "input.h"
 #include "render.h"
 #include "window.h"
-#include <stdio.h>
 
 void InitSDL()
 {

@@ -1,9 +1,9 @@
+#include <string.h>
+
 #include "draw.h"
 #include "game.h"
 #include "vector.h"
 #include "window.h"
-
-#include <string.h>
 
 void DrawBackground(const Game* game)
 {

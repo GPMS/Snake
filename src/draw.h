@@ -1,9 +1,9 @@
 #pragma once
 
-#include "vector.h"
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+
+#include "vector.h"
 
 #define CENTERED -1
 
