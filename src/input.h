@@ -1,5 +1,4 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <SDL2/SDL.h>
 
@@ -11,5 +10,3 @@ SDL_bool KeyRelease(SDL_KeyCode key);
 
 // Adds Input event to a list so that it can be processed later
 void Input_Process(struct Game* game);
-
-#endif

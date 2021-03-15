@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 // Entry point for the program
 int main(int argc, char* argv[])
 {

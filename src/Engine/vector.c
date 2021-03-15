@@ -44,8 +44,8 @@ Vec2 Vector2_Mul(Vec2 v, float n)
 {
     Vec2 new;
 
-    new.x = v.x * n;
-    new.y = v.y * n;
+    new.x = v.x* n;
+    new.y = v.y* n;
 
     return new;
 }
@@ -67,7 +67,7 @@ float Vector2_Dot(Vec2 a, Vec2 b)
 
 float Vector2_Mag(Vec2 v)
 {
-    return (float) sqrt(v.x * v.x + v.y * v.y);
+    return (float)sqrt(v.x * v.x + v.y * v.y);
 }
 
 Vec2 Vector2_Norm(Vec2 v)
@@ -84,17 +84,16 @@ Vec2 Vector2_Rotate(Vec2 v, float radians)
 {
     Vec2 new;
 
-    float cosine = (float) cos(radians);
-    float sine = (float) sin(radians);
+    float cosine = (float)cos(radians);
+    float sine   = (float)sin(radians);
 
-    new.x = v.x * cosine - v.y * sine;
-    new.x = v.x * sine + v.y * cosine;
+    new.x = (v.x * cosine) - (v.y * sine);
+    new.x = (v.x * sine) + (v.y * cosine);
 
     return new;
 }
 
 float Lerp(float start, float end, float percent)
 {
-    return start + (end - start)*percent;
+    return start + (end - start) * percent;
 }
-

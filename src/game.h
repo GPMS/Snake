@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include "Engine/vector.h"
 
@@ -22,35 +21,35 @@ enum GameState {
 
 // Contains data necessary to run the game
 typedef struct Game {
-    struct Window*  window;
+    struct Window* window;
 
     // Game internal information
-    SDL_bool        isRunning;
-    float           fps;
-    Uint32          dt;
-    enum GameState  state;
+    SDL_bool       isRunning;
+    float          fps;
+    Uint32         dt;
+    enum GameState state;
 
     // Input
-    char            text[4];
-    int             textLength;
+    char text[4];
+    int  textLength;
 
     // Font files
-    TTF_Font*       font;
+    TTF_Font* font;
 
     // Game Logic
-    int             rows, cols;
+    int rows, cols;
 
-    int             option;
-    SDL_bool        isInputTooShort;
+    int      option;
+    SDL_bool isInputTooShort;
 
-    Vec2            applePos;
+    Vec2 applePos;
 
-    Snake           snake;
-    int             initialSize;
+    Snake snake;
+    int   initialSize;
 
-    int             score;
-    int             pos;
-    Score           highScores[5];
+    int   score;
+    int   pos;
+    Score highScores[5];
 } Game;
 
 void Game_Reset(Game* game);
@@ -63,5 +62,3 @@ void Game_Quit(Game* game);
 
 // Game loop...
 void Game_Loop(Game* game);
-
-#endif

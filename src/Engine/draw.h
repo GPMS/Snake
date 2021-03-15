@@ -1,5 +1,4 @@
-#ifndef DRAW_H
-#define DRAW_H
+#pragma once
 
 #include "vector.h"
 
@@ -7,7 +6,6 @@
 #include <SDL2/SDL_ttf.h>
 
 #define CENTERED -1
-
 
 extern const SDL_Color white;
 extern const SDL_Color black;
@@ -22,41 +20,38 @@ extern const SDL_Color lightOrange;
 extern const SDL_Color lightBlue;
 extern const SDL_Color yellow;
 
-
 struct Window;
 
-
 // Set draw color
-void SetDrawColor(SDL_Renderer* renderer,
+void SetDrawColor(SDL_Renderer*    renderer,
                   const SDL_Color* color);
 
 // Clear screen to color
-void ClearScreen(SDL_Renderer* renderer,
+void ClearScreen(SDL_Renderer*    renderer,
                  const SDL_Color* color);
 
 void CopyTexture(SDL_Renderer* renderer,
-                 SDL_Texture* texture,
-                 Vec2 position,
-                 float width, float height);
+                 SDL_Texture*  texture,
+                 Vec2          position,
+                 float         width,
+                 float         height);
 
 // Draw text on screen
-void DrawText(struct Window* window,
+void DrawText(struct Window*   window,
               const SDL_Color* color,
-              Vec2 position,
-              const char* text,
-              TTF_Font* font);
+              Vec2             position,
+              const char*      text,
+              TTF_Font*        font);
 
 // Draw rectangle filled with color
-void DrawFillRect(SDL_Renderer* renderer,
+void DrawFillRect(SDL_Renderer*    renderer,
                   const SDL_Color* color,
-                  Vec2 position,
-                  int width, int height);
+                  Vec2             position,
+                  int              width,
+                  int              height);
 
 // Draw square filled with color
-void DrawFillSquare(SDL_Renderer* renderer,
+void DrawFillSquare(SDL_Renderer*    renderer,
                     const SDL_Color* color,
-                    Vec2 position,
-                    int size);
-
-#endif
-
+                    Vec2             position,
+                    int              size);
