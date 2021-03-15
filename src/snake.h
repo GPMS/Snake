@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine/vector.h"
+#include "vector.h"
 
 struct Game;
 
@@ -24,8 +24,8 @@ typedef struct Snake {
     int partsDrawn;
 } Snake;
 
-void  Snake_Reset(struct Game* game);
-void  Snake_Destroy(Snake* snake);
-void  Snake_HandleInput(struct Game* game);
-void  Snake_Update(struct Game* game);
-void  Snake_Draw(const struct Game* game);
+void Snake_Reset(struct Game* game);
+void Snake_Destroy(Snake* snake);
+void Snake_HandleInput(struct Game* game);
+void Snake_Update(struct Game* game);
+void Snake_Draw(const struct Game* game);

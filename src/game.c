@@ -1,7 +1,8 @@
 #include "game.h"
-#include "Engine/window.h"
+
 #include "input.h"
 #include "render.h"
+#include "window.h"
 #include <stdio.h>
 
 void InitSDL()

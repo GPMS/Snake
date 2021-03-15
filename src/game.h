@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Engine/vector.h"
-
-#include "snake.h"
-#include "highscore.h"
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+
+#include "highscore.h"
+#include "snake.h"
+#include "vector.h"
 
 struct Window;
 

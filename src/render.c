@@ -1,8 +1,7 @@
+#include "draw.h"
 #include "game.h"
-
-#include "Engine/draw.h"
-#include "Engine/window.h"
-#include "Engine/vector.h"
+#include "vector.h"
+#include "window.h"
 
 #include <string.h>
 

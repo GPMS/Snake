@@ -1,4 +1,5 @@
 #include "input.h"
+
 #include "game.h"
 
 #include <stdio.h>

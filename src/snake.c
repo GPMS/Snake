@@ -1,11 +1,10 @@
 #include "snake.h"
 
+#include "draw.h"
 #include "game.h"
-#include "input.h"
 #include "highscore.h"
-
-#include "Engine/draw.h"
-#include "Engine/window.h"
+#include "input.h"
+#include "window.h"
 
 #include <stdlib.h>
 
