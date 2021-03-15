@@ -5,7 +5,7 @@
 #include "vector.h"
 #include "window.h"
 
-void DrawBackground(const Game* game)
+static void DrawBackground(const Game* game)
 {
     SDL_Renderer* renderer = game->window->SDLRenderer;
 
@@ -22,7 +22,7 @@ void DrawBackground(const Game* game)
     DrawFillSquare(renderer, &grey, Vector2(2 * BLOCK_SIZE, 3 * BLOCK_SIZE), 22 * BLOCK_SIZE);
 }
 
-void DrawGameScreen(const Game* game)
+static void DrawGameScreen(const Game* game)
 {
     DrawBackground(game);
 
@@ -32,7 +32,7 @@ void DrawGameScreen(const Game* game)
     Snake_Draw(game);
 }
 
-void DrawPauseScreen(const Game* game)
+static void DrawPauseScreen(const Game* game)
 {
     DrawBackground(game);
 
@@ -41,7 +41,7 @@ void DrawPauseScreen(const Game* game)
     DrawText(game->window, &white, Vector2(CENTERED, CENTERED), "Press p to continue", game->font);
 }
 
-void DrawGameOverScreen(Game* game)
+static void DrawGameOverScreen(Game* game)
 {
     DrawText(game->window, &white, Vector2(CENTERED, 5 * BLOCK_SIZE), "GAME OVER", game->font);
 
@@ -61,7 +61,7 @@ void DrawGameOverScreen(Game* game)
     }
 }
 
-void DrawPlaces(const Game* game, int curPlace)
+static void DrawPlaces(const Game* game, int curPlace)
 {
     char str[128] = "";
 
@@ -81,7 +81,7 @@ void DrawPlaces(const Game* game, int curPlace)
     DrawPlaces(game, ++curPlace);
 }
 
-void DrawHighscoreScreen(Game* game)
+static void DrawHighscoreScreen(Game* game)
 {
     DrawText(game->window, &lightBlue, Vector2(CENTERED, 2 * BLOCK_SIZE), "Highscore Board", game->font);
     DrawText(game->window, &yellow, Vector2(CENTERED, 4 * BLOCK_SIZE), "Place\tScore\tName", game->font);
@@ -89,7 +89,7 @@ void DrawHighscoreScreen(Game* game)
     DrawPlaces(game, 0);
 }
 
-void DrawNewHighscore(Game* game)
+static void DrawNewHighscore(Game* game)
 {
     DrawText(game->window, &white, Vector2(CENTERED, 15 * BLOCK_SIZE), "New Highscore!", game->font);
 

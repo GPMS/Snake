@@ -8,22 +8,21 @@
 #include "input.h"
 #include "window.h"
 
-unsigned int RangedRandom(unsigned int min, unsigned int max)
+static unsigned int RangedRandom(unsigned int min, unsigned int max)
 {
-    double scaled = (double)rand() / RAND_MAX;
-
+    const double scaled = (double)rand() / RAND_MAX;
     return (max - min + 1) * scaled + min;
 }
 
-void GetRandomApplePos(Game* game)
+static void GetRandomApplePos(Game* game)
 {
     Snake* snake = &game->snake;
     Vec2*  apple = &game->applePos;
 
-    int maxRow = game->rows - 2;
-    int minRow = 3;
-    int maxCol = game->cols - 3;
-    int minCol = 2;
+    const int maxRow = game->rows - 2;
+    const int minRow = 3;
+    const int maxCol = game->cols - 3;
+    const int minCol = 2;
 
     while (1) {
         // Change apple location
@@ -87,16 +86,15 @@ void Snake_HandleInput(Game* game)
     }
 }
 
-void AppleCollision(Game* game)
+static void AppleCollision(Game* game)
 {
     Snake* snake = &game->snake;
     Vec2   apple = game->applePos;
 
-    if ((snake->head->pos.x == apple.x) && (snake->head->pos.y == apple.y)) {
-        int gamePlayArea     = game->rows * game->cols;
-        int scoreGain        = 10;
-        int maxPossibleScore = (gamePlayArea - game->initialSize)
-                               * scoreGain;
+    if (Vector2_Compare(snake->body[0].pos, apple) == 0) {
+        const int gamePlayArea     = game->rows * game->cols;
+        const int scoreGain        = 10;
+        const int maxPossibleScore = (gamePlayArea - game->initialSize) * scoreGain;
 
         if (game->score < maxPossibleScore)
             game->score += scoreGain;
@@ -108,7 +106,7 @@ void AppleCollision(Game* game)
     }
 }
 
-void BodyCollision(Game* game)
+static void BodyCollision(Game* game)
 {
     Snake* snake = &game->snake;
 
@@ -124,14 +122,14 @@ void BodyCollision(Game* game)
     }
 }
 
-void WallCollision(Game* game)
+static void WallCollision(Game* game)
 {
     Body* head = &game->snake.body[0];
 
-    int maxRow = game->rows - 2;
-    int minRow = 3;
-    int maxCol = game->cols - 3;
-    int minCol = 2;
+    const int maxRow = game->rows - 2;
+    const int minRow = 3;
+    const int maxCol = game->cols - 3;
+    const int minCol = 2;
 
     // up
     if (head->pos.y < minRow) {
@@ -155,14 +153,14 @@ void WallCollision(Game* game)
     }
 }
 
-void CollisionCheck(Game* game)
+static void CollisionCheck(Game* game)
 {
     AppleCollision(game);
     BodyCollision(game);
     WallCollision(game);
 }
 
-void Move(Game* game)
+static void Move(Game* game)
 {
     Snake* snake = &game->snake;
 
@@ -198,11 +196,10 @@ void Snake_Update(Game* game)
 {
     Snake* snake = &game->snake;
 
-    // Move every moveSpeed miliseconds
     static int time = 0;
     time += game->dt;
-    int moveSpeed = 80;
-    if (time >= moveSpeed) {
+    const int moveDelay = 80;  // in miliseconds
+    if (time >= moveDelay) {
         Move(game);
         time = 0;
     }
@@ -226,7 +223,7 @@ void Snake_Draw(const Game* game)
     SDL_Renderer* renderer = game->window->SDLRenderer;
     const Snake*  snake    = &game->snake;
 
-    int size = BLOCK_SIZE - 5;
+    const int size = BLOCK_SIZE - 5;
 
     for (unsigned int i = 0; i < snake->partsDrawn; i++) {
         // Don't draw blocks without defined position

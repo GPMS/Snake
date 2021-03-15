@@ -39,7 +39,7 @@ SDL_bool KeyRelease(SDL_KeyCode key)
     return SDL_FALSE;
 }
 
-void HandleKeyEvents(Game* game)
+static void HandleKeyEvents(Game* game)
 {
     if (KeyRelease(SDLK_ESCAPE)) {
         game->isRunning = SDL_FALSE;

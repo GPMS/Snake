@@ -6,7 +6,7 @@
 #include "render.h"
 #include "window.h"
 
-void InitSDL()
+static void InitSDL()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "SDL_Init: %s", SDL_GetError());
@@ -19,15 +19,15 @@ void InitSDL()
     }
 }
 
-void QuitSDL()
+static void QuitSDL()
 {
     TTF_Quit();
     SDL_Quit();
 }
 
 // Wrapper for TTF_OpenFont
-TTF_Font* LoadFont(const char* file,
-                   const int   size)
+static TTF_Font* LoadFont(const char* file,
+                          const int   size)
 {
     TTF_Font* font = TTF_OpenFont(file, size);
     if (!font) {
@@ -38,7 +38,7 @@ TTF_Font* LoadFont(const char* file,
 }
 
 // Loads all necessary resources into SDL
-void LoadResources(Game* game)
+static void LoadResources(Game* game)
 {
     game->font = LoadFont("resources/font.ttf", 24);
 }
@@ -124,7 +124,7 @@ static void CalculateFPS(Game* game, const unsigned int targetFPS)
     game->fps = fps;
 }
 
-void Update(Game* game)
+static void Update(Game* game)
 {
     if (game->state == PLAY) {
         Snake_Update(game);

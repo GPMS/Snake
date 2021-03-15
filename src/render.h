@@ -6,6 +6,3 @@ struct Game;
 
 // Draws the game
 void Render(struct Game* game);
-
-void SetDrawColor(SDL_Renderer*    renderer,
-                  const SDL_Color* color);
