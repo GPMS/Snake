@@ -55,6 +55,7 @@ void Game_Reset(Game* game)
     game->isRunning = SDL_TRUE;
 
     game->score       = 0;
+    game->place       = -1;
     game->initialSize = 4;
 
     Snake_Destroy(&game->snake);

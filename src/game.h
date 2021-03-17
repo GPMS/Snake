@@ -47,6 +47,7 @@ typedef struct Game {
     int   initialSize;
 
     int   score;
+    int   place;
     int   pos;
     Score highScores[5];
 } Game;

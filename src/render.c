@@ -95,40 +95,21 @@ static void DrawNewHighscore(Game* game)
 
     /* Show place and score */
     char place[4];
-
-    int i;
-    int placeNum;
-    for (i = 4; i > -1; i--) {
-        if (game->score < game->highScores[i].value) {
-            placeNum = i + 2;
-            break;
-        } else {
-            placeNum = 1;
-        }
-    }
-
-    switch (placeNum) {
+    switch (game->place + 1) {
         case 1:
-            place[1] = 's';
-            place[2] = 't';
+            snprintf(place, 4, "1st");
             break;
         case 2:
-            place[1] = 'n';
-            place[2] = 'd';
+            snprintf(place, 4, "2nd");
             break;
         case 3:
-            place[1] = 'r';
-            place[2] = 'd';
+            snprintf(place, 4, "3rd");
             break;
         default:
-            place[1] = 't';
-            place[2] = 'h';
+            snprintf(place, 4, "%dth", game->place + 1);
             break;
     }
-    place[0] = placeNum + '0';
-    place[3] = '\0';
-
-    char str[128] = "";
+    char str[11] = "";
     sprintf(str, "%s place", place);
 
     DrawText(game->window, &white, Vector2(CENTERED, 16 * BLOCK_SIZE), str, game->font);
@@ -138,16 +119,12 @@ static void DrawNewHighscore(Game* game)
 
     DrawText(game->window, &white, Vector2(CENTERED, 18 * BLOCK_SIZE), game->text, game->font);
 
-    game->pos = placeNum - 1;
-
     if (game->option == 1) {
         if (game->isInputTooShort) {
             DrawText(game->window, &white, Vector2(CENTERED, 19 * BLOCK_SIZE), "At least 3 characters", game->font);
             return;
         }
-
-        strcpy(game->highScores[game->pos].name,
-               game->text);
+        strcpy(game->highScores[game->place].name, game->text);
         Game_Reset(game);
     }
 }

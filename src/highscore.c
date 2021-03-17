@@ -12,8 +12,7 @@ void ShiftPlace(Game* game, int place)
     char holdN[2][4] = {"", ""};  // name
     int  holdV[2]    = {0, 0};    // score
 
-    for (i = place; i < 4; i++) {
-
+    for (i = place; i < 5; i++) {
         holdV[side] = game->highScores[i + 1].value;
         strcpy(holdN[side], game->highScores[i + 1].name);
 
@@ -31,24 +30,22 @@ void ShiftPlace(Game* game, int place)
 
 void Highscore_New(Game* game)
 {
-    for (int i = 4; i > -1; i--) {
-        if (game->score < game->highScores[i].value) {
-            ShiftPlace(game, i + 1);
-
-            strcpy(game->highScores[i + 1].name, "---");
-            game->highScores[i + 1].value = game->score;
-            break;
-        } else if (game->score == game->highScores[i].value) {
-            ShiftPlace(game, i);
-
-            strcpy(game->highScores[i].name, "---");
-            game->highScores[i].value = game->score;
-            break;
-        } else if (i == 0) {
-            ShiftPlace(game, 0);
-
-            strcpy(game->highScores[0].name, "---");
-            game->highScores[0].value = game->score;
+    if (game->score > game->highScores[0].value) {
+        printf("new 1st place\n");
+        game->place = 0;
+        ShiftPlace(game, 0);
+        strcpy(game->highScores[0].name, "---");
+        game->highScores[0].value = game->score;
+    } else {
+        for (int i = 4; i > -1; i--) {
+            if (game->score <= game->highScores[i].value) {
+                printf("%d <= %d -> %d place\n", game->score, game->highScores[i].value, i + 1);
+                game->place = i + 1;
+                ShiftPlace(game, i + 2);
+                strcpy(game->highScores[i + 1].name, "---");
+                game->highScores[i + 1].value = game->score;
+                break;
+            }
         }
     }
 
