@@ -39,7 +39,6 @@ typedef struct Game {
     int rows, cols;
 
     int      option;
-    SDL_bool isInputTooShort;
 
     Vec2 applePos;
 

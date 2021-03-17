@@ -48,9 +48,8 @@ void Game_Reset(Game* game)
     game->state = PLAY;
 
     game->option = -1;
-    strcpy(game->text, "???");
-    game->textLength      = 0;
-    game->isInputTooShort = SDL_FALSE;
+    strcpy(game->text, "---");
+    game->textLength = 0;
 
     game->isRunning = SDL_TRUE;
 

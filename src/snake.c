@@ -210,7 +210,6 @@ void Snake_Update(Game* game)
         if (snake->partsDrawn > snake->bodyLength - 1) {
             snake->bodyLength *= 2;
             snake->body = realloc(snake->body, snake->bodyLength * sizeof(Body));
-            printf("Realloc length = %d\n", snake->bodyLength);
         }
 
         snake->body[snake->partsDrawn].pos     = snake->body[snake->partsDrawn - 1].pastPos;

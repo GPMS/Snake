@@ -62,12 +62,12 @@ static void HandleKeyEvents(Game* game)
         }
     } else if (game->state == NEW_HIGHSCORE) {
         if (KeyRelease(SDLK_RETURN)) {
-            if (game->textLength < 3)
-                game->isInputTooShort = SDL_TRUE;
             game->option = 1;
         } else if (KeyPress(SDLK_BACKSPACE) || KeyHold(SDLK_BACKSPACE)) {
-            if (game->textLength > 0)
-                game->text[--game->textLength] = '?';
+            if (game->textLength > 0) {
+                game->text[--game->textLength] = '-';
+                strcpy(game->highScores[game->place].name, game->text);
+            }
         }
     }
 }
@@ -86,8 +86,14 @@ void Input_Process(Game* game)
                 break;
 
             case SDL_TEXTINPUT:
-                if (game->textLength < 3)
-                    game->text[game->textLength++] = event.edit.text[0];
+                if (game->state == NEW_HIGHSCORE) {
+                    if (game->textLength < 3) {
+                        if (event.edit.text[0] != '?' && event.edit.text[0] != '-') {
+                            game->text[game->textLength++] = event.edit.text[0];
+                            strcpy(game->highScores[game->place].name, game->text);
+                        }
+                    }
+                }
                 break;
         }
     }

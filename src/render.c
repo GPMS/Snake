@@ -91,9 +91,11 @@ static void DrawHighscoreScreen(Game* game)
 
 static void DrawNewHighscore(Game* game)
 {
+    DrawFillRect(game->window->SDLRenderer, &white, Vector2(21 * BLOCK_SIZE, (5 + game->place) * BLOCK_SIZE), 40, 10);
     DrawText(game->window, &white, Vector2(CENTERED, 15 * BLOCK_SIZE), "New Highscore!", game->font);
 
     /* Show place and score */
+
     char place[4];
     switch (game->place + 1) {
         case 1:
@@ -120,9 +122,9 @@ static void DrawNewHighscore(Game* game)
     DrawText(game->window, &white, Vector2(CENTERED, 18 * BLOCK_SIZE), game->text, game->font);
 
     if (game->option == 1) {
-        if (game->isInputTooShort) {
-            DrawText(game->window, &white, Vector2(CENTERED, 19 * BLOCK_SIZE), "At least 3 characters", game->font);
-            return;
+        for (int i = 0; i < 3; i++) {
+            if (game->text[i] == '?' || game->text[i] == '-')
+                game->text[i] = ' ';
         }
         strcpy(game->highScores[game->place].name, game->text);
         Game_Reset(game);
@@ -147,12 +149,6 @@ void Render(Game* game)
             DrawHighscoreScreen(game);
             DrawNewHighscore(game);
             break;
-    }
-
-    if (game->isInputTooShort) {
-        SDL_Delay(500);
-        game->isInputTooShort = SDL_FALSE;
-        game->option          = -1;
     }
 
     SDL_RenderPresent(game->window->SDLRenderer);
