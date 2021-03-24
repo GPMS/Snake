@@ -11,6 +11,7 @@ echo "Building in $config mode"
 buildDir="build/$config"
 
 cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=$config -B $buildDir
+mv $buildDir/compile_commands.json .
 cp -R resources $buildDir
 cd $buildDir && make
 
