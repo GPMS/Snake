@@ -12,7 +12,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES C_STANDARD 99)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE SDL2
-    PRIVATE SDL2_image
     PRIVATE SDL2_ttf
     PRIVATE m
 )
