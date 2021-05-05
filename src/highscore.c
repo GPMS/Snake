@@ -31,7 +31,6 @@ void ShiftPlace(Game* game, int place)
 void Highscore_New(Game* game)
 {
     if (game->score > game->highScores[0].value) {
-        printf("new 1st place\n");
         game->place = 0;
         ShiftPlace(game, 0);
         strcpy(game->highScores[0].name, "---");
@@ -39,7 +38,6 @@ void Highscore_New(Game* game)
     } else {
         for (int i = 4; i > -1; i--) {
             if (game->score <= game->highScores[i].value) {
-                printf("%d <= %d -> %d place\n", game->score, game->highScores[i].value, i + 1);
                 game->place = i + 1;
                 ShiftPlace(game, i + 2);
                 strcpy(game->highScores[i + 1].name, "---");
