@@ -4,10 +4,12 @@
 
 struct Game;
 
-enum dir { NORTH,
-           EAST,
-           WEST,
-           SOUTH };
+enum dir {
+    NORTH,
+    EAST,
+    WEST,
+    SOUTH
+};
 
 typedef struct Body {
     Vec2 pos;
