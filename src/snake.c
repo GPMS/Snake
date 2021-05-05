@@ -71,16 +71,16 @@ void Snake_HandleInput(Game* game)
 {
     Snake* snake = &game->snake;
 
-    if (KeyRelease(SDLK_UP)) {
+    if (IsKeyDown(SDL_SCANCODE_UP)) {
         if (snake->parts == 1 || snake->direction != SOUTH)
             snake->direction = NORTH;
-    } else if (KeyRelease(SDLK_DOWN)) {
+    } else if (IsKeyDown(SDL_SCANCODE_DOWN)) {
         if (snake->parts == 1 || snake->direction != NORTH)
             snake->direction = SOUTH;
-    } else if (KeyRelease(SDLK_LEFT)) {
+    } else if (IsKeyDown(SDL_SCANCODE_LEFT)) {
         if (snake->parts == 1 || snake->direction != EAST)
             snake->direction = WEST;
-    } else if (KeyRelease(SDLK_RIGHT)) {
+    } else if (IsKeyDown(SDL_SCANCODE_RIGHT)) {
         if (snake->parts == 1 || snake->direction != WEST)
             snake->direction = EAST;
     }

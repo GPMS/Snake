@@ -131,12 +131,81 @@ static void Update(Game* game)
     }
 }
 
+static void HandleInput(Game* game)
+{
+    // quit
+    if (IsKeyReleased(SDL_SCANCODE_ESCAPE)) {
+        game->isRunning = SDL_FALSE;
+    }
+
+    // Toggle play/pause
+    if (IsKeyReleased(SDL_SCANCODE_P)) {
+        if (game->state == PLAY)
+            game->state = PAUSE;
+        else if (game->state == PAUSE)
+            game->state = PLAY;
+    }
+
+    switch (game->state) {
+        case PLAY:
+            Snake_HandleInput(game);
+            break;
+        case GAMEOVER:
+            // Continue?
+            if (IsKeyReleased(SDL_SCANCODE_Y)) {
+                game->option = 1;
+            } else if (IsKeyReleased(SDL_SCANCODE_N)) {
+                game->option = 0;
+            }
+            break;
+        case NEW_HIGHSCORE:
+            // Get name for new highscore
+            if (HasTextInput()) {
+                const char* textInput = GetTextInput();
+                int         len       = strlen(textInput);
+
+                for (int i = 0; i < len; i++) {
+                    char c = textInput[i];
+
+                    if (c == '\0') {
+                        break;
+                    }
+
+                    if (game->textLength >= 3)
+                        break;
+
+                    if (c != '?' && c != '-') {
+                        game->text[game->textLength++] = c;
+                        strcpy(game->highScores[game->place].name, game->text);
+                    }
+                }
+            }
+
+            // Delete one character from name
+            if (IsKeyPressed(SDL_SCANCODE_BACKSPACE) || IsKeyHeld(SDL_SCANCODE_BACKSPACE)) {
+                if (game->textLength > 0) {
+                    game->text[--game->textLength] = '-';
+                    strcpy(game->highScores[game->place].name, game->text);
+                }
+            }
+
+            // Confirm name
+            if (IsKeyReleased(SDL_SCANCODE_RETURN)) {
+                game->option = 1;
+            }
+            break;
+        default:;
+    }
+}
+
 void Game_Loop(Game* game)
 {
     while (game->isRunning) {
         CalculateFPS(game, 30);
 
-        Input_Process(game);
+        game->isRunning = Input_Poll(game);
+        HandleInput(game);
+
         Update(game);
         Render(game);
     }

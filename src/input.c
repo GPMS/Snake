@@ -4,97 +4,88 @@
 
 #include "game.h"
 
-static SDL_Event event;
+#define NUM_KEYS 256
+static bool           isKeyDown[NUM_KEYS]   = {false};
+static bool           wasKeyDown[NUM_KEYS]  = {false};
+static unsigned       timePressed[NUM_KEYS] = {0};  // SDL timestamp for when the key was pressed
+static const unsigned DELAY                 = 300;  // time in ms needed to recognize key being held
+static bool           hasTextInput          = false;
+static char           textInput[32]         = "";
 
-SDL_bool KeyPress(SDL_KeyCode key)
+bool IsKeyDown(SDL_Scancode key)
 {
-    const SDL_KeyboardEvent* keyEvent = &event.key;
-
-    if (keyEvent->keysym.sym == key && keyEvent->state == SDL_PRESSED && keyEvent->repeat == 0) {
-        return SDL_TRUE;
-    }
-
-    return SDL_FALSE;
+    return isKeyDown[key];
 }
 
-SDL_bool KeyHold(SDL_KeyCode key)
+bool IsKeyUp(SDL_Scancode key)
 {
-    const SDL_KeyboardEvent* keyEvent = &event.key;
-
-    if (keyEvent->keysym.sym == key && keyEvent->state == SDL_PRESSED && keyEvent->repeat != 0) {
-        return SDL_TRUE;
-    }
-
-    return SDL_FALSE;
+    return !isKeyDown[key];
 }
 
-SDL_bool KeyRelease(SDL_KeyCode key)
+bool IsKeyPressed(SDL_Scancode key)
 {
-    const SDL_KeyboardEvent* keyEvent = &event.key;
-
-    if (keyEvent->keysym.sym == key && keyEvent->state == SDL_RELEASED) {
-        return SDL_TRUE;
-    }
-
-    return SDL_FALSE;
+    return isKeyDown[key] && !wasKeyDown[key];
 }
 
-static void HandleKeyEvents(Game* game)
+bool IsKeyReleased(SDL_Scancode key)
 {
-    if (KeyRelease(SDLK_ESCAPE)) {
-        game->isRunning = SDL_FALSE;
-    }
-
-    if (KeyRelease(SDLK_p)) {
-        if (game->state == PLAY)
-            game->state = PAUSE;
-        else if (game->state == PAUSE)
-            game->state = PLAY;
-    }
-
-    if (game->state == PLAY) {
-        Snake_HandleInput(game);
-    } else if (game->state == GAMEOVER) {
-        if (KeyRelease(SDLK_y)) {
-            game->option = 1;
-        } else if (KeyRelease(SDLK_n)) {
-            game->option = 0;
-        }
-    } else if (game->state == NEW_HIGHSCORE) {
-        if (KeyRelease(SDLK_RETURN)) {
-            game->option = 1;
-        } else if (KeyPress(SDLK_BACKSPACE) || KeyHold(SDLK_BACKSPACE)) {
-            if (game->textLength > 0) {
-                game->text[--game->textLength] = '-';
-                strcpy(game->highScores[game->place].name, game->text);
-            }
-        }
-    }
+    return !isKeyDown[key] && wasKeyDown[key];
 }
 
-void Input_Process(Game* game)
+bool IsKeyHeld(SDL_Scancode key)
 {
+    if (!isKeyDown[key])
+        return false;
+
+    if (SDL_GetTicks() - timePressed[key] < DELAY) {
+        return false;
+    }
+
+    return true;
+}
+
+bool HasTextInput()
+{
+    return hasTextInput;
+}
+
+const char* GetTextInput()
+{
+    return textInput;
+}
+
+bool Input_Poll(Game* game)
+{
+    hasTextInput = false;
+    for (int i = 0; i < NUM_KEYS; i++) {
+        wasKeyDown[i] = isKeyDown[i];
+    }
+
+    SDL_Event event;
+    unsigned  textInputLength = 0;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
-                game->isRunning = SDL_FALSE;
+                return false;
                 break;
-
             case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                HandleKeyEvents(game);
-                break;
-
-            case SDL_TEXTINPUT:
-                if (game->state == NEW_HIGHSCORE) {
-                    if (game->textLength < 3) {
-                        if (event.edit.text[0] != '?' && event.edit.text[0] != '-') {
-                            game->text[game->textLength++] = event.edit.text[0];
-                            strcpy(game->highScores[game->place].name, game->text);
-                        }
-                    }
+                if (!isKeyDown[event.key.keysym.scancode]) {
+                    isKeyDown[event.key.keysym.scancode]   = true;
+                    timePressed[event.key.keysym.scancode] = SDL_GetTicks();
                 }
+                break;
+            case SDL_KEYUP:
+                if (isKeyDown[event.key.keysym.scancode]) {
+                    isKeyDown[event.key.keysym.scancode]   = false;
+                    timePressed[event.key.keysym.scancode] = 0;
+                }
+                break;
+            case SDL_TEXTINPUT:
+                hasTextInput               = true;
+                textInput[textInputLength] = event.edit.text[textInputLength];
+                textInputLength++;
                 break;
         }
     }
+    return true;
 }

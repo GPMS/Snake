@@ -1,12 +1,19 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
 struct Game;
 
-SDL_bool KeyPress(SDL_KeyCode key);
-SDL_bool KeyHold(SDL_KeyCode key);
-SDL_bool KeyRelease(SDL_KeyCode key);
+bool IsKeyDown(SDL_Scancode key);
+bool IsKeyUp(SDL_Scancode key);
+bool IsKeyPressed(SDL_Scancode key);
+bool IsKeyReleased(SDL_Scancode key);
+bool IsKeyHeld(SDL_Scancode key);
+bool HasTextInput();
 
-// Adds Input event to a list so that it can be processed later
-void Input_Process(struct Game* game);
+// returns null terminated string with the input
+const char* GetTextInput();
+
+// Poll window events. Returns true if the window is still open
+bool Input_Poll(struct Game* game);
