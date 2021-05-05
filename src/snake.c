@@ -47,6 +47,7 @@ void Snake_Reset(Game* game)
 {
     Snake* snake = &game->snake;
 
+    free(snake->body);
     snake->direction  = EAST;
     snake->parts      = game->initialSize;
     snake->partsDrawn = 1;
@@ -56,15 +57,6 @@ void Snake_Reset(Game* game)
     snake->body[0].pos = Vector2(5, 10);
 
     GetRandomApplePos(game);
-}
-
-void Snake_Destroy(Snake* snake)
-{
-    free(snake->body);
-
-    snake->bodyLength = 0;
-    snake->parts      = 0;
-    snake->partsDrawn = 0;
 }
 
 void Snake_HandleInput(Game* game)
