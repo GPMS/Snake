@@ -59,25 +59,6 @@ void Snake_Reset(Game* game)
     GetRandomApplePos(game);
 }
 
-void Snake_HandleInput(Game* game)
-{
-    Snake* snake = &game->snake;
-
-    if (IsKeyDown(SDL_SCANCODE_UP)) {
-        if (snake->parts == 1 || snake->direction != SOUTH)
-            snake->direction = NORTH;
-    } else if (IsKeyDown(SDL_SCANCODE_DOWN)) {
-        if (snake->parts == 1 || snake->direction != NORTH)
-            snake->direction = SOUTH;
-    } else if (IsKeyDown(SDL_SCANCODE_LEFT)) {
-        if (snake->parts == 1 || snake->direction != EAST)
-            snake->direction = WEST;
-    } else if (IsKeyDown(SDL_SCANCODE_RIGHT)) {
-        if (snake->parts == 1 || snake->direction != WEST)
-            snake->direction = EAST;
-    }
-}
-
 static void AppleCollision(Game* game)
 {
     Snake* snake = &game->snake;
@@ -187,6 +168,20 @@ static void Move(Game* game)
 void Snake_Update(Game* game)
 {
     Snake* snake = &game->snake;
+
+    if (IsKeyDown(SDL_SCANCODE_UP)) {
+        if (snake->parts == 1 || snake->direction != SOUTH)
+            snake->direction = NORTH;
+    } else if (IsKeyDown(SDL_SCANCODE_DOWN)) {
+        if (snake->parts == 1 || snake->direction != NORTH)
+            snake->direction = SOUTH;
+    } else if (IsKeyDown(SDL_SCANCODE_LEFT)) {
+        if (snake->parts == 1 || snake->direction != EAST)
+            snake->direction = WEST;
+    } else if (IsKeyDown(SDL_SCANCODE_RIGHT)) {
+        if (snake->parts == 1 || snake->direction != WEST)
+            snake->direction = EAST;
+    }
 
     static int time = 0;
     time += game->dt;

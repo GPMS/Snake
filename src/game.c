@@ -140,7 +140,6 @@ static void Update(Game* game)
 
     switch (game->state) {
         case PLAY:
-            Snake_HandleInput(game);
             Snake_Update(game);
             break;
         case GAMEOVER:
