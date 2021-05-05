@@ -4,7 +4,7 @@
 
 #include "game.h"
 
-#define NUM_KEYS 256
+#define NUM_KEYS 285  // Taken from SDL Scancode Lookup Table
 static bool           isKeyDown[NUM_KEYS]   = {false};
 static bool           wasKeyDown[NUM_KEYS]  = {false};
 static unsigned       timePressed[NUM_KEYS] = {0};  // SDL timestamp for when the key was pressed
