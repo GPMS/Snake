@@ -53,7 +53,7 @@ static void DrawGameOverScreen(Game* game)
 
     switch (game->option) {
         case 0:
-            game->isRunning = SDL_FALSE;
+            game->isRunning = false;
             break;
         case 1:
             Game_Reset(game);

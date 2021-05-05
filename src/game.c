@@ -51,7 +51,7 @@ void Game_Reset(Game* game)
     strcpy(game->text, "---");
     game->textLength = 0;
 
-    game->isRunning = SDL_TRUE;
+    game->isRunning = true;
 
     game->score       = 0;
     game->place       = -1;
@@ -127,7 +127,7 @@ static void Update(Game* game)
 {
     // quit
     if (IsKeyReleased(SDL_SCANCODE_ESCAPE)) {
-        game->isRunning = SDL_FALSE;
+        game->isRunning = false;
     }
 
     // Toggle play/pause

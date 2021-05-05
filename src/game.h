@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
@@ -23,7 +25,7 @@ typedef struct Game {
     struct Window* window;
 
     // Game internal information
-    SDL_bool       isRunning;
+    bool           isRunning;
     float          fps;
     Uint32         dt;
     enum GameState state;
@@ -38,7 +40,7 @@ typedef struct Game {
     // Game Logic
     int rows, cols;
 
-    int      option;
+    int option;
 
     Vec2 applePos;
 

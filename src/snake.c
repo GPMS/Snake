@@ -30,11 +30,11 @@ static void SetRandomApplePos(Game* game)
                          RangedRandom(minRow, maxRow));
 
         // Check if location doesn't overlap with the snake
-        SDL_bool isOverlapping = SDL_FALSE;
+        bool isOverlapping = false;
 
         for (unsigned int i = 0; i < snake->partsDrawn; i++) {
             if ((apple->x == snake->body[i].pos.x) && (apple->y == snake->body[i].pos.y)) {
-                isOverlapping = SDL_TRUE;
+                isOverlapping = true;
                 break;
             }
         }
