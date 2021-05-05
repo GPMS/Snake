@@ -14,7 +14,7 @@ static unsigned int RangedRandom(unsigned int min, unsigned int max)
     return (max - min + 1) * scaled + min;
 }
 
-static void GetRandomApplePos(Game* game)
+static void SetRandomApplePos(Game* game)
 {
     Snake* snake = &game->snake;
     Vec2*  apple = &game->applePos;
@@ -56,7 +56,7 @@ void Snake_Reset(Game* game)
     snake->body        = malloc(snake->bodyLength * sizeof(Body));
     snake->body[0].pos = Vector2(5, 10);
 
-    GetRandomApplePos(game);
+    SetRandomApplePos(game);
 }
 
 static void AppleCollision(Game* game)
@@ -72,7 +72,7 @@ static void AppleCollision(Game* game)
         if (game->score < maxPossibleScore)
             game->score += scoreGain;
 
-        GetRandomApplePos(game);
+        SetRandomApplePos(game);
 
         // Add body parts
         snake->parts++;
