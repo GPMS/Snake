@@ -126,13 +126,6 @@ static void CalculateFPS(Game* game, const unsigned int targetFPS)
 
 static void Update(Game* game)
 {
-    if (game->state == PLAY) {
-        Snake_Update(game);
-    }
-}
-
-static void HandleInput(Game* game)
-{
     // quit
     if (IsKeyReleased(SDL_SCANCODE_ESCAPE)) {
         game->isRunning = SDL_FALSE;
@@ -149,6 +142,7 @@ static void HandleInput(Game* game)
     switch (game->state) {
         case PLAY:
             Snake_HandleInput(game);
+            Snake_Update(game);
             break;
         case GAMEOVER:
             // Continue?
@@ -204,8 +198,6 @@ void Game_Loop(Game* game)
         CalculateFPS(game, 30);
 
         game->isRunning = Input_Poll(game);
-        HandleInput(game);
-
         Update(game);
         Render(game);
     }
