@@ -7,6 +7,7 @@ A Snake game in C using SDL2.
 Arch Linux:
 - gcc
 - cmake
+- make
 - sdl2
 - sdl2_ttf
 
