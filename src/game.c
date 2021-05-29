@@ -40,7 +40,7 @@ static TTF_Font* LoadFont(const char* file,
 // Loads all necessary resources into SDL
 static void LoadResources(Game* game)
 {
-    game->font = LoadFont("resources/font.ttf", 24);
+    game->font = LoadFont("resources/fonts/joystix/joystix_monospace.ttf", 25);
 }
 
 void Game_Reset(Game* game)

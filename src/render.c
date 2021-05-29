@@ -74,7 +74,7 @@ static void DrawPlaces(const Game* game, int curPlace)
     if (curPlace == 5)
         return;
 
-    sprintf(str, "  %d  \t%5d\t %s", curPlace + 1, game->highScores[curPlace].value, game->highScores[curPlace].name);
+    sprintf(str, "  %d  %5d %s", curPlace + 1, game->highScores[curPlace].value, game->highScores[curPlace].name);
 
     DrawText(game->window, &colours[curPlace], Vector2(CENTERED, (5 + curPlace) * BLOCK_SIZE), str, game->font);
 
@@ -84,7 +84,7 @@ static void DrawPlaces(const Game* game, int curPlace)
 static void DrawHighscoreScreen(Game* game)
 {
     DrawText(game->window, &lightBlue, Vector2(CENTERED, 2 * BLOCK_SIZE), "Highscore Board", game->font);
-    DrawText(game->window, &yellow, Vector2(CENTERED, 4 * BLOCK_SIZE), "Place\tScore\tName", game->font);
+    DrawText(game->window, &yellow, Vector2(CENTERED, 4 * BLOCK_SIZE), "Place Score Name", game->font);
 
     DrawPlaces(game, 0);
 }
