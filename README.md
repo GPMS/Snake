@@ -2,6 +2,8 @@
 
 A Snake game in C using SDL2.
 
+![Screenshot](resources/images/screenshot.png "Screenshot")
+
 ## Requirements
 
 Arch Linux:
