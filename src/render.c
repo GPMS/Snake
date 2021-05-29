@@ -4,6 +4,7 @@
 #include "game.h"
 #include "vector.h"
 #include "window.h"
+#include "highscore.h"
 
 static void DrawBackground(const Game* game)
 {
@@ -15,7 +16,7 @@ static void DrawBackground(const Game* game)
     sprintf(str, "score:%d", game->score);
     DrawText(game->window, &white, Vector2(2 * BLOCK_SIZE, BLOCK_SIZE), str, game->font);
 
-    sprintf(str, "highest:%d", game->highScores[0].value);
+    sprintf(str, "highest:%d", Highscore_GetHighestScore());
     DrawText(game->window, &white, Vector2((game->cols - 13) * BLOCK_SIZE, BLOCK_SIZE), str, game->font);
 
     // Draw main screen
@@ -61,76 +62,6 @@ static void DrawGameOverScreen(Game* game)
     }
 }
 
-static void DrawPlaces(const Game* game, int curPlace)
-{
-    char str[128] = "";
-
-    SDL_Color colours[5] = {lightGrey,
-                            red,
-                            orange,
-                            lightPink,
-                            lightOrange};
-
-    if (curPlace == 5)
-        return;
-
-    sprintf(str, "  %d  %5d %s", curPlace + 1, game->highScores[curPlace].value, game->highScores[curPlace].name);
-
-    DrawText(game->window, &colours[curPlace], Vector2(CENTERED, (5 + curPlace) * BLOCK_SIZE), str, game->font);
-
-    DrawPlaces(game, ++curPlace);
-}
-
-static void DrawHighscoreScreen(Game* game)
-{
-    DrawText(game->window, &lightBlue, Vector2(CENTERED, 2 * BLOCK_SIZE), "Highscore Board", game->font);
-    DrawText(game->window, &yellow, Vector2(CENTERED, 4 * BLOCK_SIZE), "Place Score Name", game->font);
-
-    DrawPlaces(game, 0);
-}
-
-static void DrawNewHighscore(Game* game)
-{
-    DrawFillRect(game->window->SDLRenderer, &white, Vector2(21 * BLOCK_SIZE, (5 + game->place) * BLOCK_SIZE), 40, 10);
-    DrawText(game->window, &white, Vector2(CENTERED, 15 * BLOCK_SIZE), "New Highscore!", game->font);
-
-    /* Show place and score */
-
-    char place[4];
-    switch (game->place + 1) {
-        case 1:
-            snprintf(place, 4, "1st");
-            break;
-        case 2:
-            snprintf(place, 4, "2nd");
-            break;
-        case 3:
-            snprintf(place, 4, "3rd");
-            break;
-        default:
-            snprintf(place, 4, "%dth", game->place + 1);
-            break;
-    }
-    char str[11] = "";
-    sprintf(str, "%s place", place);
-
-    DrawText(game->window, &white, Vector2(CENTERED, 16 * BLOCK_SIZE), str, game->font);
-
-    /* Prompt */
-    DrawText(game->window, &white, Vector2(CENTERED, 17 * BLOCK_SIZE), "Input your name", game->font);
-
-    DrawText(game->window, &white, Vector2(CENTERED, 18 * BLOCK_SIZE), game->text, game->font);
-
-    if (game->option == 1) {
-        for (int i = 0; i < 3; i++) {
-            if (game->text[i] == '?' || game->text[i] == '-')
-                game->text[i] = ' ';
-        }
-        strcpy(game->highScores[game->place].name, game->text);
-        Game_Reset(game);
-    }
-}
-
 void Render(Game* game)
 {
     ClearScreen(game->window->SDLRenderer, &black);
@@ -146,8 +77,7 @@ void Render(Game* game)
             DrawGameOverScreen(game);
             break;
         case NEW_HIGHSCORE:
-            DrawHighscoreScreen(game);
-            DrawNewHighscore(game);
+            Highscore_Draw(game);
             break;
     }
 

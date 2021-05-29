@@ -151,40 +151,7 @@ static void Update(Game* game)
             }
             break;
         case NEW_HIGHSCORE:
-            // Get name for new highscore
-            if (HasTextInput()) {
-                const char* textInput = GetTextInput();
-                int         len       = strlen(textInput);
-
-                for (int i = 0; i < len; i++) {
-                    char c = textInput[i];
-
-                    if (c == '\0') {
-                        break;
-                    }
-
-                    if (game->textLength >= 3)
-                        break;
-
-                    if (c != '?' && c != '-') {
-                        game->text[game->textLength++] = c;
-                        strcpy(game->highScores[game->place].name, game->text);
-                    }
-                }
-            }
-
-            // Delete one character from name
-            if (IsKeyPressed(SDL_SCANCODE_BACKSPACE) || IsKeyHeld(SDL_SCANCODE_BACKSPACE)) {
-                if (game->textLength > 0) {
-                    game->text[--game->textLength] = '-';
-                    strcpy(game->highScores[game->place].name, game->text);
-                }
-            }
-
-            // Confirm name
-            if (IsKeyReleased(SDL_SCANCODE_RETURN)) {
-                game->option = 1;
-            }
+            Highscore_Update(game);
             break;
         default:;
     }

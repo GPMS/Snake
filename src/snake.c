@@ -85,7 +85,7 @@ static void BodyCollision(Game* game)
 
     for (unsigned int i = 1; i < snake->partsDrawn; i++) {
         if (Vector2_Compare(snake->body[0].pos, snake->body[i].pos) == 0) {
-            if (game->score >= game->highScores[4].value) {
+            if (game->score > Highscore_GetLowestScore()) {
                 Highscore_New(game);
             } else {
                 game->state = GAMEOVER;

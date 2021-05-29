@@ -43,6 +43,10 @@ void DrawText(struct Window*   window,
               const char*      text,
               TTF_Font*        font);
 
+void DrawLine(SDL_Renderer* renderer,
+              Vec2          a,
+              Vec2          b);
+
 // Draw rectangle filled with color
 void DrawFillRect(SDL_Renderer*    renderer,
                   const SDL_Color* color,

@@ -47,10 +47,8 @@ typedef struct Game {
     Snake snake;
     int   initialSize;
 
-    int   score;
-    int   place;
-    int   pos;
-    Score highScores[5];
+    int score;
+    int place;
 } Game;
 
 void Game_Reset(Game* game);

@@ -66,6 +66,11 @@ void DrawText(Window*          window,
     SDL_DestroyTexture(label);
 }
 
+void DrawLine(SDL_Renderer* renderer, Vec2 a, Vec2 b)
+{
+    SDL_RenderDrawLine(renderer, (int)a.x, (int)a.y, (int)b.x, (int)b.y);
+}
+
 void DrawFillRect(SDL_Renderer*    renderer,
                   const SDL_Color* color,
                   Vec2             position,
